@@ -1,0 +1,4 @@
+interface:
+  display_name: "Thesis Defense PPTX"
+  short_description: "Build template-matched thesis defense decks."
+  default_prompt: "Create a thesis defense PPTX from my local thesis project and template, then export and inspect it for layout issues."

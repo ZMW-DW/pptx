@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Generated validation artifacts
+*_validation/
+visual_check/
+contact_sheet.png
+overflow.json
+scan.json
+
+# Local Office temporary files
+~$*.pptx
+~$*.docx
+*.tmp
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
