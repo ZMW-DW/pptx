@@ -1,5 +1,7 @@
 # Thesis Defense PPTX Skill
 
+[中文说明](README.zh-CN.md)
+
 A reusable Codex/Agent Skill for creating editable thesis defense PowerPoint decks from local thesis files and an existing `.pptx` visual template.
 
 The workflow is designed for cases where template fidelity matters: university defense decks, lab report decks, branded academic presentations, and local private thesis projects.
