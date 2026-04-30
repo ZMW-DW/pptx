@@ -16,6 +16,62 @@ The workflow is designed for cases where template fidelity matters: university d
 - Uses PowerPoint COM to detect risky text overflow based on real PowerPoint rendering.
 - Scans for stale template text and placeholders before delivery.
 
+## Why This Skill Exists
+
+Many AI slide generators are good at creating a new deck style from a document. Thesis defense work often needs the opposite: keep an existing university or lab `.pptx` template almost unchanged, then replace the content with concise, defense-ready material.
+
+This skill is optimized for that template-preservation workflow:
+
+- It treats the user's supplied `.pptx` template as the visual source of truth.
+- It copies native template slides first, then edits content in place.
+- It keeps school colors, cover pages, navigation bars, card layouts, font sizes, and slide proportions aligned with the original deck.
+- It favors conservative academic presentation wording over generic AI presentation copy.
+- It validates the final deck with real PowerPoint rendering instead of only checking the file structure.
+
+## Compared With `ppt-master`
+
+[`ppt-master`](https://github.com/hugohe3/ppt-master) is an excellent open-source project for generating native, editable PowerPoint files from documents, Markdown, URLs, and other sources. It is especially strong when the goal is to create a new editable deck with AI-designed pages.
+
+This skill has a narrower goal: thesis defense decks that must strictly follow an existing PowerPoint template.
+
+| Dimension | `ppt-master` | `thesis-defense-pptx` |
+|---|---|---|
+| Primary goal | Generate native editable PPTX from source documents | Generate defense PPTX while preserving an existing template |
+| Best fit | New AI-designed decks, document-to-PPT workflows, editable SVG/DrawingML pipelines | University defense decks, lab report decks, branded academic templates |
+| Template handling | Can reference or create templates, but the workflow is design-generation oriented | Copies the user's original PPTX slides and edits them in place |
+| Visual fidelity to an existing deck | Depends on template import and generated layout | Treated as the top priority |
+| Output | Editable PPTX | Editable PPTX |
+| Quality gate | SVG/project checks and export pipeline | PowerPoint PNG export, contact sheet review, overflow scan, stale text scan |
+
+Use `ppt-master` when you want a powerful general-purpose AI PPT generation engine. Use this skill when your first requirement is: "do not redesign my school template; keep it looking like the original deck."
+
+## How It Works
+
+The skill follows a conservative local workflow:
+
+1. Read the thesis PDF/LaTeX/Word project and optional old defense deck.
+2. Extract the research background, problem definition, method, experiments, figures, key results, and conclusion.
+3. Inspect the supplied `.pptx` template for cover style, section pages, navigation labels, fonts, colors, cards, and spacing.
+4. Clone or reuse native template slides with PowerPoint COM where available.
+5. Replace text, images, tables, and charts using editable PowerPoint objects.
+6. Export the generated deck to PNG and build a contact sheet.
+7. Check text overflow, stale template words, missing figures, wrong navigation labels, and obvious visual issues.
+8. Iterate until the deck is ready to review.
+
+## Copyright And Relationship To `ppt-master`
+
+This repository is not a fork of `ppt-master`, does not vendor `ppt-master`, and does not copy its source code. The current implementation uses its own small scripts around PowerPoint COM, `python-pptx`, Pillow, and PDF/text extraction utilities.
+
+`ppt-master` is cited here as related work and as a useful comparison point. If future versions directly reuse code from `ppt-master`, the reused files and license notices should be included explicitly according to its MIT License.
+
+Users are responsible for making sure they have the right to use their thesis text, figures, school templates, logos, and any third-party materials included in the generated deck.
+
+## Community
+
+[LINUX DO — 中文开发者社区](https://linux.do/)
+
+This project recognizes and appreciates LINUX DO as a Chinese developer community for open-source sharing and technical discussion. This acknowledgement is not a claim of official endorsement unless separately stated by the community.
+
 ## Repository Layout
 
 ```text
@@ -122,4 +178,4 @@ This skill intentionally does not ship a built-in slide template. It is meant to
 
 ## License
 
-MIT
+MIT License. See [LICENSE](LICENSE).
