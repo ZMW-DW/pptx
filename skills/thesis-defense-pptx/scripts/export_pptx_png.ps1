@@ -19,6 +19,7 @@ if (!(Test-Path -LiteralPath $pptxPath)) {
     throw "PPTX not found: $pptxPath"
 }
 New-Item -ItemType Directory -Force -Path $outPath | Out-Null
+Get-ChildItem -LiteralPath $outPath -Filter "*.PNG" -ErrorAction SilentlyContinue | Remove-Item -Force
 
 $pp = $null
 $pres = $null

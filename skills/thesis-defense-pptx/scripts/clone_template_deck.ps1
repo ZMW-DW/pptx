@@ -23,12 +23,9 @@ if ($outDir -and !(Test-Path -LiteralPath $outDir)) {
 }
 
 $pp = $null
-$source = $null
 $dest = $null
 
 try {
-    $pp = New-Object -ComObject PowerPoint.Application
-
     if ([string]::IsNullOrWhiteSpace($SlideSequence)) {
         Copy-Item -LiteralPath $templatePath -Destination $outputPath -Force
         Write-Output $outputPath
@@ -46,33 +43,37 @@ try {
         throw "SlideSequence did not contain any slide numbers."
     }
 
-    $source = $pp.Presentations.Open($templatePath, $true, $false, $false)
-    $slideCount = $source.Slides.Count
+    Copy-Item -LiteralPath $templatePath -Destination $outputPath -Force
+
+    $pp = New-Object -ComObject PowerPoint.Application
+    $dest = $pp.Presentations.Open($outputPath, $false, $false, $false)
+    $slideCount = $dest.Slides.Count
     foreach ($idx in $indices) {
         if ($idx -lt 1 -or $idx -gt $slideCount) {
             throw "Slide index $idx is outside template slide range 1..$slideCount"
         }
     }
-    $source.Close()
-    [System.Runtime.InteropServices.Marshal]::ReleaseComObject($source) | Out-Null
-    $source = $null
 
-    $dest = $pp.Presentations.Add($false)
+    $originalSlides = @()
+    for ($i = 1; $i -le $slideCount; $i++) {
+        $originalSlides += $dest.Slides.Item($i)
+    }
+
     foreach ($idx in $indices) {
-        [void]$dest.Slides.InsertFromFile($templatePath, $dest.Slides.Count, $idx, $idx)
+        $dupRange = $originalSlides[$idx - 1].Duplicate()
+        $newSlide = $dupRange.Item(1)
+        $newSlide.MoveTo($dest.Slides.Count)
+        [System.Runtime.InteropServices.Marshal]::ReleaseComObject($dupRange) | Out-Null
     }
 
-    if (Test-Path -LiteralPath $outputPath) {
-        Remove-Item -LiteralPath $outputPath -Force
+    for ($i = $slideCount; $i -ge 1; $i--) {
+        $dest.Slides.Item($i).Delete()
     }
+
     $dest.SaveAs($outputPath, 24)
     Write-Output $outputPath
 }
 finally {
-    if ($source -ne $null) {
-        try { $source.Close() } catch {}
-        [System.Runtime.InteropServices.Marshal]::ReleaseComObject($source) | Out-Null
-    }
     if ($dest -ne $null) {
         try { $dest.Close() } catch {}
         [System.Runtime.InteropServices.Marshal]::ReleaseComObject($dest) | Out-Null

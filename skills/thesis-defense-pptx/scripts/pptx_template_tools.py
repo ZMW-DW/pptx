@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Sequence
 
@@ -10,7 +11,23 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Inches, Pt
 
 
-RED = RGBColor(0x83, 0x06, 0x04)
+def _brand_red() -> RGBColor:
+    raw = os.getenv("THESIS_PPTX_BRAND_RED", "").strip()
+    if raw:
+        try:
+            if raw.startswith("#"):
+                raw = raw[1:]
+            if len(raw) == 6 and all(c in "0123456789abcdefABCDEF" for c in raw):
+                return RGBColor(int(raw[0:2], 16), int(raw[2:4], 16), int(raw[4:6], 16))
+            parts = [int(x.strip()) for x in raw.split(",")]
+            if len(parts) == 3 and all(0 <= x <= 255 for x in parts):
+                return RGBColor(parts[0], parts[1], parts[2])
+        except ValueError:
+            pass
+    return RGBColor(0x83, 0x06, 0x04)
+
+
+RED = _brand_red()
 BLACK = RGBColor(0, 0, 0)
 WHITE = RGBColor(255, 255, 255)
 

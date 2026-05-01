@@ -7,6 +7,27 @@ from pathlib import Path
 from pptx import Presentation
 
 
+def iter_shapes(shapes):
+    for shape in shapes:
+        yield shape
+        if hasattr(shape, "shapes"):
+            yield from iter_shapes(shape.shapes)
+
+
+def shape_texts(shape) -> list[str]:
+    texts: list[str] = []
+    if getattr(shape, "has_text_frame", False) and shape.text:
+        text = " ".join(shape.text.split())
+        if text:
+            texts.append(text)
+    if getattr(shape, "has_table", False):
+        for cell in shape.table.iter_cells():
+            text = " ".join(cell.text.split())
+            if text:
+                texts.append(text)
+    return texts
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Scan PPTX text and optional forbidden terms.")
     parser.add_argument("--pptx", required=True)
@@ -22,11 +43,8 @@ def main() -> int:
     hits = []
     for idx, slide in enumerate(prs.slides, 1):
         texts = []
-        for shape in slide.shapes:
-            if getattr(shape, "has_text_frame", False) and shape.text:
-                text = " ".join(shape.text.split())
-                if text:
-                    texts.append(text)
+        for shape in iter_shapes(slide.shapes):
+            texts.extend(shape_texts(shape))
         joined = "\n".join(texts)
         slide_hits = [term for term in bad_terms if term in joined]
         if slide_hits:

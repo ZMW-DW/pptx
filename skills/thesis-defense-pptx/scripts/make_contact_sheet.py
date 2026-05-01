@@ -4,12 +4,25 @@ import argparse
 import re
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 
 def slide_number(path: Path) -> int:
     match = re.search(r"(\d+)", path.stem)
     return int(match.group(1)) if match else 0
+
+
+def label_font() -> ImageFont.ImageFont:
+    for font_path in (
+        "C:/Windows/Fonts/msyh.ttc",
+        "C:/Windows/Fonts/arial.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    ):
+        try:
+            return ImageFont.truetype(font_path, 18)
+        except OSError:
+            continue
+    return ImageFont.load_default()
 
 
 def main() -> int:
@@ -34,6 +47,7 @@ def main() -> int:
     tw, th = args.thumb_width, args.thumb_height
     sheet = Image.new("RGB", (cols * tw + (cols + 1) * margin, rows * (th + label_h) + (rows + 1) * margin), "white")
     draw = ImageDraw.Draw(sheet)
+    font = label_font()
 
     for idx, path in enumerate(files):
         img = Image.open(path).convert("RGB").resize((tw, th), Image.Resampling.LANCZOS)
@@ -41,7 +55,8 @@ def main() -> int:
         row = idx // cols
         x = margin + col * (tw + margin)
         y = margin + row * (th + label_h + margin)
-        draw.text((x, y), f"Slide {idx + 1}", fill=(0, 0, 0))
+        number = slide_number(path) or idx + 1
+        draw.text((x, y), f"Slide {number}", fill=(0, 0, 0), font=font)
         sheet.paste(img, (x, y + label_h))
 
     output.parent.mkdir(parents=True, exist_ok=True)

@@ -15,6 +15,8 @@ Run these checks before final delivery.
 - Images preserve aspect ratio and are not clipped in a misleading way.
 - Tables remain readable at presentation scale.
 - Final deck is editable: text is text where possible, not a screenshot-only slide.
+- Chinese fonts are available or embedded where the delivery environment requires them; otherwise template fonts such as Source Han Sans or Founder title fonts may fall back to SimSun.
+- TOC, top navigation active state, and any static footer/page-number text agree with the final slide order.
 
 ## PowerPoint COM Checks
 

@@ -9,6 +9,7 @@ Use this skill for local, editable `.pptx` thesis defense decks that must follow
 
 ## Operating Principles
 
+- Platform: Windows + Microsoft PowerPoint for COM-driven cloning, export, and overflow inspection. On macOS/Linux, use the python-pptx-only parts and skip COM-based quality gates.
 - Treat the visual template as the source of truth. Preserve its cover, colors, fonts, navigation, card styles, logos, and slide proportions unless the user explicitly asks to redesign.
 - Read the thesis source first: PDF, LaTeX, figures, old PPT, experiment scripts, tables, and captions. Do not generate from topic/title alone when source files exist.
 - Prefer copying native template slides and replacing content over rebuilding from blank slides.
@@ -73,6 +74,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/clone_template_deck.
   -SlideSequence "1,2,3,4,4,6,7,8,9,10,11,12,13,14,15"
 ```
 
+In this example slide 4 is deliberately reused as a sub-section page and slide 5 is skipped.
+
 Export final deck:
 
 ```powershell
@@ -109,8 +112,10 @@ For quality criteria, read `references/pptx_quality_gate.md`.
 
 ## Implementation Notes
 
+- Requires Python 3.10+ and the packages in `requirements.txt`.
 - On Windows with Microsoft PowerPoint installed, PowerPoint COM is the most reliable way to duplicate template slides and inspect real rendering.
 - `python-pptx` is good for editable text, shapes, images, tables, and simple charts, but it does not perfectly model every PowerPoint layout/rendering behavior.
+- `scripts/pptx_template_tools.py` uses `THESIS_PPTX_BRAND_RED` when set (`#830604`, `830604`, or `131,6,4`) so new school templates do not require source edits for the primary red.
 - When a PowerPoint add-in blocks COM automation, disable only the broken add-in autoload if necessary and report that action.
 - Use backups before overwriting a deck.
 - Never revert unrelated user files while iterating.

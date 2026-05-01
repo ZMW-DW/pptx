@@ -7,13 +7,17 @@ from pathlib import Path
 
 TEXT_EXTS = {".tex", ".bib", ".md", ".txt"}
 FIG_EXTS = {".png", ".jpg", ".jpeg", ".svg", ".pdf"}
+FIG_DIR_HINTS = ("figure", "fig", "image", "img", "图", "插图")
 
 
 def read_pdf(path: Path, max_pages: int | None = None) -> str:
     try:
-        import fitz  # PyMuPDF
+        import pymupdf as fitz
     except Exception:
-        fitz = None
+        try:
+            import fitz  # PyMuPDF legacy import
+        except Exception:
+            fitz = None
 
     if fitz is not None:
         parts: list[str] = []
@@ -55,6 +59,17 @@ def extract_tex_sections(text: str) -> list[tuple[str, str]]:
     return sections
 
 
+def read_text_with_fallback(path: Path) -> str | None:
+    for enc in ("utf-8", "gb18030", "gbk", "utf-8-sig"):
+        try:
+            return path.read_text(encoding=enc)
+        except UnicodeDecodeError:
+            continue
+        except OSError:
+            return None
+    return None
+
+
 def collect_files(root: Path) -> tuple[list[Path], list[Path], list[Path]]:
     if root.is_file():
         files = [root]
@@ -63,7 +78,11 @@ def collect_files(root: Path) -> tuple[list[Path], list[Path], list[Path]]:
 
     pdfs = [p for p in files if p.suffix.lower() == ".pdf"]
     texts = [p for p in files if p.suffix.lower() in TEXT_EXTS]
-    figs = [p for p in files if p.suffix.lower() in FIG_EXTS and "figure" in str(p.parent).lower()]
+    figs = [
+        p
+        for p in files
+        if p.suffix.lower() in FIG_EXTS and any(h in str(p.parent).lower() for h in FIG_DIR_HINTS)
+    ]
     if not figs:
         figs = [p for p in files if p.suffix.lower() in {".png", ".jpg", ".jpeg", ".svg"}]
     return pdfs, texts, figs
@@ -76,7 +95,7 @@ def pick_main_pdf(pdfs: list[Path]) -> Path | None:
     scored = []
     for p in pdfs:
         score = sum(1 for n in names if n.lower() in p.name.lower())
-        score += p.stat().st_size / 1_000_000_000
+        score += p.stat().st_size / 1_000_000
         scored.append((score, p))
     return sorted(scored, reverse=True)[0][1]
 
@@ -116,9 +135,8 @@ def main() -> int:
     if tex_files:
         lines.append("## LaTeX Sections")
         for tex in sorted(tex_files)[:20]:
-            try:
-                text = tex.read_text(encoding="utf-8", errors="ignore")
-            except Exception:
+            text = read_text_with_fallback(tex)
+            if text is None:
                 continue
             sections = extract_tex_sections(text)
             if not sections:
