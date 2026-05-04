@@ -110,6 +110,27 @@ python scripts/scan_pptx_text.py `
 
 For quality criteria, read `references/pptx_quality_gate.md`.
 
+## Iteration Tips
+
+The fastest way to fail a content fill is guessing strings instead of reading them. Use this loop:
+
+1. **Dump first.** Run `scripts/dump_pptx_content.py --pptx <skeleton> --output dump.md` to list every shape's exact text, plus all table cells and picture names. Open `dump.md` and copy the strings you intend to replace.
+2. **Prefer partial match for body text.** Use `replace_partial_text(slide, {"keyword": "new full text"})` instead of `replace_exact_text` whenever the body sentence might differ from the template by a stray space, half/full-width quote, or `——` vs `—`. Pass `min_len=20` to avoid short-key collisions with navigation tags.
+3. **Keep `replace_exact_text` for short tags.** Navigation labels and section titles ("项目简介", "工作总结") are stable; exact match is safer because it cannot accidentally rewrite a body paragraph that happens to contain the same word.
+4. **Use the table/picture helpers.** `write_table(table, rows)` preserves cell font/color/size, and `replace_picture(slide, old_pic, new_path)` swaps an image while keeping position and size — both avoid the boilerplate of removing and re-creating shapes.
+5. **Re-run overflow + scan after every fill pass.** Overflow caused by longer content is the single most common bug; fix by shortening copy first, then by manual `\n` line breaks, and only resize the textbox if the template visual really allows it.
+6. **Encoding.** All Python scripts shipped here force `stdout` to UTF-8, and the PowerShell scripts force the console output codepage to UTF-8, so cp936/gbk consoles do not corrupt JSON output containing CJK paths or Unicode symbols (`−`, `Δ`, `✓`).
+
+## Script Usage
+
+Dump every slide's shapes/text/tables/pictures (run this BEFORE constructing replacement dicts):
+
+```powershell
+python scripts/dump_pptx_content.py --pptx "D:\path\skeleton.pptx" --output "D:\path\dump.md"
+```
+
+Add `--slide 4,8,9` to limit to specific slides while iterating.
+
 ## Implementation Notes
 
 - Requires Python 3.10+ and the packages in `requirements.txt`.

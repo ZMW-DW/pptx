@@ -12,6 +12,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Windows 默认 console 是 cp936/gbk，输出含中文路径或特殊符号的 JSON 会乱码。
+# 强制切到 UTF-8 让 stdout 稳定可读。
+try {
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+    $OutputEncoding = [System.Text.Encoding]::UTF8
+} catch {}
+
 $pptxPath = [System.IO.Path]::GetFullPath($Pptx)
 $outPath = [System.IO.Path]::GetFullPath($OutDir)
 

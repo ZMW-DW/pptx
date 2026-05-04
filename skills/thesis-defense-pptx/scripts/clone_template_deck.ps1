@@ -10,6 +10,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Windows 默认 console 是 cp936/gbk，输出含中文路径的字符串会乱码。
+# 强制切到 UTF-8 让 stdout 稳定可读，便于 Codex/Claude Code 解析返回值。
+try {
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+    $OutputEncoding = [System.Text.Encoding]::UTF8
+} catch {}
+
 $templatePath = [System.IO.Path]::GetFullPath($Template)
 $outputPath = [System.IO.Path]::GetFullPath($Output)
 

@@ -82,6 +82,7 @@ skills/
     │   └── pptx_quality_gate.md
     └── scripts/
         ├── clone_template_deck.ps1
+        ├── dump_pptx_content.py
         ├── export_pptx_png.ps1
         ├── extract_thesis_context.py
         ├── inspect_pptx_overflow.ps1
@@ -146,6 +147,16 @@ python .\skills\thesis-defense-pptx\scripts\extract_thesis_context.py `
   --input "D:\path\to\thesis-project" `
   --output "D:\path\to\thesis_context.md"
 ```
+
+导出整套 PPT 的形状/文本/表格/图片清单（推荐在做任何内容替换前先跑一次，把精确字符串复制到替换字典里）：
+
+```powershell
+python .\skills\thesis-defense-pptx\scripts\dump_pptx_content.py `
+  --pptx "D:\path\to\skeleton.pptx" `
+  --output "D:\path\to\dump.md"
+```
+
+可以加 `--slide 4,8,9` 只 dump 指定页，便于迭代调试。
 
 导出 PPTX 为逐页 PNG：
 

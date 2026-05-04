@@ -169,3 +169,121 @@ def replace_exact_text(slide, mapping: dict[str, str]) -> None:
             text = shape.text.strip()
             if text in mapping:
                 set_text_preserve_style(shape, mapping[text])
+
+
+def replace_partial_text(slide, mapping: dict[str, str], min_len: int = 0) -> int:
+    """按 substring 匹配批量替换文本。
+
+    与 ``replace_exact_text`` 互补:模板里小标点差异(如 ``——`` vs ``—``、空格、
+    全/半角引号)很容易让等值匹配失败，此处用包含匹配兜底。
+
+    Args:
+        mapping: ``{substring: new_full_text}``。命中任一 key 的 shape，
+            其整段文字将被替换为对应的 ``new_full_text``。
+        min_len: 仅替换原文长度不小于此值的 shape，避免短 key (如"状态")
+            误伤导航标签。默认 0 不过滤。
+
+    匹配顺序按 key 长度从长到短，避免短 key 提前命中。返回替换次数。
+    """
+    keys = sorted(mapping.keys(), key=len, reverse=True)
+    n = 0
+    for shape in iter_shapes(slide.shapes):
+        if not getattr(shape, "has_text_frame", False):
+            continue
+        text = shape.text.strip()
+        if len(text) < min_len:
+            continue
+        for key in keys:
+            if key and key in text:
+                set_text_preserve_style(shape, mapping[key])
+                n += 1
+                break
+    return n
+
+
+def find_shape_by_text(slide, needle: str):
+    """返回第一个文字包含 ``needle`` 的 shape，找不到返回 ``None``。"""
+    for shape in iter_shapes(slide.shapes):
+        if getattr(shape, "has_text_frame", False) and needle in shape.text:
+            return shape
+    return None
+
+
+def find_picture(slide, name_substr: str | None = None):
+    """返回 slide 中第一张图片 shape；可选 ``name_substr`` 过滤 shape.name。"""
+    for shape in slide.shapes:
+        if shape.shape_type == 13:  # MSO_SHAPE_TYPE.PICTURE
+            if name_substr is None or name_substr in shape.name:
+                return shape
+    return None
+
+
+def find_table(slide):
+    """返回 slide 中第一个 table 对象，找不到返回 ``None``。"""
+    for shape in slide.shapes:
+        if getattr(shape, "has_table", False):
+            return shape.table
+    return None
+
+
+def replace_picture(slide, old_pic, new_path: str | Path):
+    """用 ``new_path`` 指向的新图替换原 picture shape，保持 left/top/width/height。
+
+    python-pptx 没有原地换图 API，标准做法是删除旧 shape 后在原位置 add_picture。
+    返回新插入的 picture shape。
+    """
+    left, top, width, height = old_pic.left, old_pic.top, old_pic.width, old_pic.height
+    sp = old_pic._element
+    sp.getparent().remove(sp)
+    return slide.shapes.add_picture(str(Path(new_path)), left, top, width=width, height=height)
+
+
+def write_table(table, rows: Sequence[Sequence[str]], font_size: float | None = None) -> None:
+    """按二维数组覆盖表格单元格文字，保留每个单元格首个 run 的样式。
+
+    适合在模板里"先有表格框架再换内容"的场景。新写入的内容若多于原表格
+    维度，超出部分会被忽略，不会自动加行/加列。
+
+    Args:
+        table: ``shape.table`` 对象。
+        rows: 二维序列，``rows[r][c]`` 写入到 ``table.cell(r, c)``。
+        font_size: 显式指定字号(磅)；为 ``None`` 时沿用原单元格字号。
+    """
+    for r_idx, row in enumerate(rows):
+        if r_idx >= len(table.rows):
+            break
+        for c_idx, cell_text in enumerate(row):
+            if c_idx >= len(table.columns):
+                break
+            cell = table.cell(r_idx, c_idx)
+            old_size = None
+            old_bold = None
+            old_color = None
+            old_name = None
+            for p in cell.text_frame.paragraphs:
+                for run in p.runs:
+                    if run.text.strip():
+                        old_size = run.font.size
+                        old_bold = run.font.bold
+                        old_name = run.font.name
+                        try:
+                            old_color = run.font.color.rgb
+                        except Exception:
+                            old_color = None
+                        break
+                if old_size is not None:
+                    break
+            cell.text_frame.clear()
+            p = cell.text_frame.paragraphs[0]
+            run = p.add_run()
+            run.text = str(cell_text)
+            if old_name:
+                run.font.name = old_name
+            if old_bold is not None:
+                run.font.bold = old_bold
+            if old_color is not None:
+                run.font.color.rgb = old_color
+            if font_size is not None:
+                run.font.size = Pt(font_size)
+            elif old_size is not None:
+                run.font.size = old_size

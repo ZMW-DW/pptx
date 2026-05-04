@@ -84,6 +84,7 @@ skills/
     │   └── pptx_quality_gate.md
     └── scripts/
         ├── clone_template_deck.ps1
+        ├── dump_pptx_content.py
         ├── export_pptx_png.ps1
         ├── extract_thesis_context.py
         ├── inspect_pptx_overflow.ps1
@@ -148,6 +149,16 @@ python .\skills\thesis-defense-pptx\scripts\extract_thesis_context.py `
   --input "D:\path\to\thesis-project" `
   --output "D:\path\to\thesis_context.md"
 ```
+
+Dump every slide's shapes/text/tables/pictures (recommended before any content fill, so you can copy exact strings into your replacement dicts):
+
+```powershell
+python .\skills\thesis-defense-pptx\scripts\dump_pptx_content.py `
+  --pptx "D:\path\to\skeleton.pptx" `
+  --output "D:\path\to\dump.md"
+```
+
+Add `--slide 4,8,9` to dump only specific slides while iterating.
 
 Export a deck to PNG:
 

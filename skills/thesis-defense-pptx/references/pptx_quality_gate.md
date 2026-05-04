@@ -47,3 +47,10 @@ Escalate a warning to a real issue when exported PNGs show:
 - If English identifiers cause overflow, add spaces around separators or break them across lines.
 - If TOC/navigation order changes, update both together.
 - If a figure is unreadable, crop less, enlarge it, or replace it with a simplified figure derived from the source.
+
+## Iteration Discipline
+
+- **Dump before you replace.** Real-world template strings differ from what they look like at a glance — `——` (U+2014 EM DASH) vs `—`, half/full-width quotes, trailing whitespace, or hidden run boundaries. Run `scripts/dump_pptx_content.py` first and copy the exact strings; do not retype from a screenshot.
+- **Prefer `replace_partial_text` for body paragraphs.** Substring matching with a `min_len` guard recovers gracefully from minor template diffs. Reserve `replace_exact_text` for short, stable tags like navigation labels.
+- **Verify with a second dump.** After every fill pass, re-dump the deck (or the affected slides via `--slide 4,8,9`) and diff against intent. Catching a missed replacement before exporting PNG saves a full PowerPoint round-trip.
+- **Run overflow + scan together.** Stale text scan and overflow check probe orthogonal failure modes; running both after every iteration prevents shipping a deck that looks clean in one report and broken in the other.
