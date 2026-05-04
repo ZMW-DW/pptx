@@ -49,7 +49,7 @@ Use `ppt-master` when you want a powerful general-purpose AI PPT generation engi
 
 The skill follows a conservative local workflow:
 
-1. Read the thesis PDF/LaTeX/Word project and optional old defense deck.
+1. Read the thesis PDF/LaTeX project and optional old defense deck.
 2. Extract the research background, problem definition, method, experiments, figures, key results, and conclusion.
 3. Inspect the supplied `.pptx` template for cover style, section pages, navigation labels, fonts, colors, cards, and spacing.
 4. Clone or reuse native template slides with PowerPoint COM where available.
@@ -107,6 +107,10 @@ Install the Python dependencies:
 ```powershell
 python -m pip install python-pptx Pillow PyMuPDF pypdf
 ```
+
+## Current Input Support
+
+The bundled extractor currently supports PDF text extraction, LaTeX `.tex` section extraction, and candidate figure discovery. Word `.docx` extraction is not implemented yet. Markdown and plain text files may be read manually by an agent when relevant, but `extract_thesis_context.py` does not yet parse them into structured thesis sections.
 
 ## Install Locally
 

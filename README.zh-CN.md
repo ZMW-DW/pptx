@@ -47,7 +47,7 @@
 
 本 Skill 采用保守的本地生成流程：
 
-1. 读取论文 PDF、LaTeX/Word 项目和可选旧版答辩 PPT。
+1. 读取论文 PDF、LaTeX 项目和可选旧版答辩 PPT。
 2. 提取研究背景、问题定义、方法设计、实验设置、实验结果、结论和候选图表。
 3. 分析用户提供的 `.pptx` 模板，包括封面、目录、章节页、导航、字体、字号、颜色、卡片和间距。
 4. 在可用时使用 PowerPoint COM 复制模板原生页面，生成稳定的 PPT 骨架。
@@ -106,6 +106,10 @@ skills/
 python -m pip install python-pptx Pillow PyMuPDF pypdf
 ```
 
+## 当前输入支持范围
+
+当前内置提取脚本主要支持 PDF 文本提取、LaTeX `.tex` 章节提取和候选图表扫描。Word `.docx` 提取尚未实现。Markdown 和纯文本文件可以由 Agent 在需要时手动读取参考，但 `extract_thesis_context.py` 目前还不会把它们解析成结构化论文上下文。
+
 ## 本地安装
 
 将 Skill 复制到 Codex skills 目录：
@@ -124,7 +128,7 @@ Copy-Item -Recurse -Force `
 
 ## 推荐流程
 
-1. 从论文 PDF/LaTeX/Word 项目中提取研究背景、方法、实验和结论。
+1. 从论文 PDF/LaTeX 项目中提取研究背景、方法、实验和结论。
 2. 分析用户提供的 PowerPoint 模板。
 3. 使用 PowerPoint COM 复制模板原生页面，生成 PPT 骨架。
 4. 将论文内容转写为答辩口径，填入可编辑文本框、表格和图表。

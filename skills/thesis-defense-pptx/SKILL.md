@@ -1,6 +1,6 @@
 ---
 name: thesis-defense-pptx
-description: Create, polish, and quality-check editable undergraduate or graduate thesis defense PowerPoint decks from a local thesis PDF/LaTeX/Word project and an existing PPTX template. Use when the user asks for a formal defense PPT, thesis presentation, academic答辩PPT, template-matched PPTX, or local PowerPoint deck generation with visual inspection.
+description: Create, polish, and quality-check editable undergraduate or graduate thesis defense PowerPoint decks from a local thesis PDF/LaTeX project and an existing PPTX template. Use when the user asks for a formal defense PPT, thesis presentation, academic答辩PPT, template-matched PPTX, or local PowerPoint deck generation with visual inspection.
 ---
 
 # Thesis Defense PPTX
