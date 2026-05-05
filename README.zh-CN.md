@@ -2,7 +2,7 @@
 
 一个用于生成本科/研究生毕业论文答辩 PPT 的 Codex/Agent Skill。它面向需要严格复用本地 PowerPoint 模板的场景，能够从本地论文 PDF/LaTeX 项目和指定 `.pptx` 模板出发，生成可编辑的正式答辩 PPTX，并执行逐页导出、版式检查和文字溢出检查。
 
-[English README](README.md)
+[English README](README.en.md)
 
 ## 功能
 

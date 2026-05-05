@@ -1,78 +1,91 @@
 # Thesis Defense PPTX Skill
 
-[中文说明](README.zh-CN.md)
+一个用于生成本科/研究生毕业论文答辩 PPT 的 Codex/Agent Skill。它面向需要严格复用本地 PowerPoint 模板的场景，能够从本地论文 PDF/LaTeX 项目和指定 `.pptx` 模板出发，生成可编辑的正式答辩 PPTX，并执行逐页导出、版式检查和文字溢出检查。
 
-A reusable Codex/Agent Skill for creating editable thesis defense PowerPoint decks from local thesis files and an existing `.pptx` visual template.
+[English README](README.en.md)
 
-The workflow is designed for cases where template fidelity matters: university defense decks, lab report decks, branded academic presentations, and local private thesis projects.
+## 一分钟看效果
 
-## What It Does
+仓库自带最小可跑示例 [`examples/minimal_markdown/`](examples/minimal_markdown/)，在仓库根目录跑：
 
-- Reads thesis source material from a local PDF/LaTeX project.
-- Preserves an existing PowerPoint template's cover, typography, colors, navigation, card style, and slide proportions.
-- Builds editable `.pptx` decks instead of image-only slides.
-- Exports slides to PNG for visual review.
-- Generates a contact sheet for whole-deck inspection.
-- Uses PowerPoint COM to detect risky text overflow based on real PowerPoint rendering.
-- Scans for stale template text and placeholders before delivery.
+```bash
+python examples/minimal_markdown/run_example.py
+```
 
-## Why This Skill Exists
+脚本会现场生成模板、可编辑 PPTX、dump 结构、scan 旧词，并输出整套 PPT 总览图：
 
-Many AI slide generators are good at creating a new deck style from a document. Thesis defense work often needs the opposite: keep an existing university or lab `.pptx` template almost unchanged, then replace the content with concise, defense-ready material.
+![预览总览图](examples/minimal_markdown/expected/contact_sheet.png)
 
-This skill is optimized for that template-preservation workflow:
+> 该示例不依赖 Microsoft PowerPoint，因此 macOS / Linux / Windows 都能跑通。
+> 真实交付仍建议在 Windows + PowerPoint 下走 COM 导出和文字溢出检查。
 
-- It treats the user's supplied `.pptx` template as the visual source of truth.
-- It copies native template slides first, then edits content in place.
-- It keeps school colors, cover pages, navigation bars, card layouts, font sizes, and slide proportions aligned with the original deck.
-- It favors conservative academic presentation wording over generic AI presentation copy.
-- It validates the final deck with real PowerPoint rendering instead of only checking the file structure.
+## 功能
 
-## Compared With `ppt-master`
+- 从本地论文 PDF/LaTeX 项目中提取论文内容和候选图表。
+- 尽量保留已有 PowerPoint 模板的封面、字体、字号、配色、导航、卡片样式和页面比例。
+- 输出真实可编辑的 `.pptx` 文件，而不是图片型幻灯片。
+- 使用 PowerPoint COM 导出逐页 PNG，便于视觉检查。
+- 生成整套 PPT 的总览图，快速发现版式问题。
+- 使用真实 PowerPoint 渲染结果检查文字框溢出风险。
+- 检查旧模板文字、占位词、TODO 等残留内容。
 
-[`ppt-master`](https://github.com/hugohe3/ppt-master) is an excellent open-source project for generating native, editable PowerPoint files from documents, Markdown, URLs, and other sources. It is especially strong when the goal is to create a new editable deck with AI-designed pages.
+## 为什么需要这个 Skill
 
-This skill has a narrower goal: thesis defense decks that must strictly follow an existing PowerPoint template.
+很多 AI PPT 工具擅长从文档重新设计一套新风格 PPT。但毕业论文答辩经常有相反的需求：学校或学院已经给了 `.pptx` 模板，封面、校徽、郑大红配色、顶部导航、卡片式正文、字体大小都不希望被改掉，只需要把论文内容转成适合答辩展示的表达。
 
-| Dimension | `ppt-master` | `thesis-defense-pptx` |
+本 Skill 针对的正是这种“严格套用现成模板”的工作流：
+
+- 把用户提供的 `.pptx` 模板作为视觉基准。
+- 优先复制模板中的原生页面，再替换内容。
+- 尽量保持封面、章节页、导航条、卡片样式、字体字号、颜色和页面比例。
+- 将论文段落转写为正式、简洁、适合答辩讲述的页面内容。
+- 使用真实 PowerPoint 导出结果做逐页检查，而不是只检查文件能否生成。
+
+## 与 `ppt-master` 的对比
+
+[`ppt-master`](https://github.com/hugohe3/ppt-master) 是一个优秀的开源项目，主打从 PDF、Word、Markdown、网页等资料生成原生可编辑 PPTX。它更适合从资料出发重新生成一套 AI 设计的可编辑 PPT。
+
+本 Skill 的目标更窄：生成毕业论文答辩 PPT，并尽量严格沿用用户已有的 PowerPoint 模板。
+
+| 维度 | `ppt-master` | `thesis-defense-pptx` |
 |---|---|---|
-| Primary goal | Generate native editable PPTX from source documents | Generate defense PPTX while preserving an existing template |
-| Best fit | New AI-designed decks, document-to-PPT workflows, editable SVG/DrawingML pipelines | University defense decks, lab report decks, branded academic templates |
-| Template handling | Can reference or create templates, but the workflow is design-generation oriented | Copies the user's original PPTX slides and edits them in place |
-| Visual fidelity to an existing deck | Depends on template import and generated layout | Treated as the top priority |
-| Output | Editable PPTX | Editable PPTX |
-| Quality gate | SVG/project checks and export pipeline | PowerPoint PNG export, contact sheet review, overflow scan, stale text scan |
+| 核心目标 | 从资料生成原生可编辑 PPTX | 在保留现有模板的基础上生成答辩 PPTX |
+| 适用场景 | 新建 AI 设计风格 PPT、文档转 PPT、可编辑 SVG/DrawingML 流程 | 本科/研究生答辩、学院模板、实验室模板、品牌学术汇报 |
+| 模板处理 | 可以参考或创建模板，但整体偏生成式设计 | 直接复制用户原始 PPTX 模板页并在其上替换内容 |
+| 对既有模板的还原度 | 取决于模板导入和生成效果 | 作为最高优先级处理 |
+| 输出形态 | 可编辑 PPTX | 可编辑 PPTX |
+| 质量检查 | SVG/project 检查和导出流程 | PowerPoint 导出 PNG、总览图检查、文字溢出检查、旧模板词扫描 |
 
-Use `ppt-master` when you want a powerful general-purpose AI PPT generation engine. Use this skill when your first requirement is: "do not redesign my school template; keep it looking like the original deck."
+如果你想从资料生成一套全新的可编辑 PPT，`ppt-master` 更合适；如果你已经有学校模板，并且要求“封面、配色、导航、卡片风格都别乱改”，本 Skill 更合适。
 
-## How It Works
+## 工作原理
 
-The skill follows a conservative local workflow:
+本 Skill 采用保守的本地生成流程：
 
-1. Read the thesis PDF/LaTeX project and optional old defense deck.
-2. Extract the research background, problem definition, method, experiments, figures, key results, and conclusion.
-3. Inspect the supplied `.pptx` template for cover style, section pages, navigation labels, fonts, colors, cards, and spacing.
-4. Clone or reuse native template slides with PowerPoint COM where available.
-5. Replace text, images, tables, and charts using editable PowerPoint objects.
-6. Export the generated deck to PNG and build a contact sheet.
-7. Check text overflow, stale template words, missing figures, wrong navigation labels, and obvious visual issues.
-8. Iterate until the deck is ready to review.
+1. 读取论文 PDF、LaTeX 项目和可选旧版答辩 PPT。
+2. 提取研究背景、问题定义、方法设计、实验设置、实验结果、结论和候选图表。
+3. 分析用户提供的 `.pptx` 模板，包括封面、目录、章节页、导航、字体、字号、颜色、卡片和间距。
+4. 在可用时使用 PowerPoint COM 复制模板原生页面，生成稳定的 PPT 骨架。
+5. 用可编辑的 PowerPoint 文本框、图片、表格和图形替换内容。
+6. 导出逐页 PNG，生成整套 PPT 的总览图。
+7. 检查文字溢出、旧模板词残留、图片缺失、导航错误和明显视觉问题。
+8. 根据检查结果继续修复，直到达到交付标准。
 
-## Copyright And Relationship To `ppt-master`
+## 版权与 `ppt-master` 关系说明
 
-This repository is not a fork of `ppt-master`, does not vendor `ppt-master`, and does not copy its source code. The current implementation uses its own small scripts around PowerPoint COM, `python-pptx`, Pillow, and PDF/text extraction utilities.
+本仓库不是 `ppt-master` 的 fork，不内置 `ppt-master`，也没有复制 `ppt-master` 的源代码。当前实现是围绕 PowerPoint COM、`python-pptx`、Pillow 和 PDF/文本提取工具编写的一组独立脚本。
 
-`ppt-master` is cited here as related work and as a useful comparison point. If future versions directly reuse code from `ppt-master`, the reused files and license notices should be included explicitly according to its MIT License.
+README 中引用 `ppt-master` 是为了说明相关开源项目和适用场景差异。若未来版本直接复用 `ppt-master` 的代码，应按照其 MIT License 明确保留对应源码文件和版权/许可声明。
 
-Users are responsible for making sure they have the right to use their thesis text, figures, school templates, logos, and any third-party materials included in the generated deck.
+使用者需要自行确认其论文文本、实验图、学校模板、校徽、字体和第三方素材具备合法使用权限。本 Skill 不自带学校模板，也不分发第三方模板资产。
 
-## Community
+## 社区
 
 [LINUX DO — 中文开发者社区](https://linux.do/)
 
-This project recognizes and appreciates LINUX DO as a Chinese developer community for open-source sharing and technical discussion. This acknowledgement is not a claim of official endorsement unless separately stated by the community.
+本项目认可并感谢 LINUX DO 社区在中文开发者开源交流、项目分享和技术讨论中的价值。除非社区另有明确说明，此处仅为社区致谢和链接，不代表官方背书。
 
-## Repository Layout
+## 仓库结构
 
 ```text
 skills/
@@ -93,29 +106,29 @@ skills/
         └── scan_pptx_text.py
 ```
 
-## Requirements
+## 环境要求
 
-- Windows is recommended for full quality checking.
-- Microsoft PowerPoint is required for COM-based slide cloning, PNG export, and overflow inspection.
-- Python 3.10+.
-- Python packages:
+- 推荐在 Windows 上使用。
+- 如果需要完整质量检查，需要安装 Microsoft PowerPoint。
+- Python 3.10 或更高版本。
+- Python 依赖：
   - `python-pptx`
   - `Pillow`
-  - `PyMuPDF` or `pypdf` for PDF extraction
+  - `PyMuPDF` 或 `pypdf`
 
-Install the Python dependencies:
+安装依赖：
 
 ```powershell
 python -m pip install python-pptx Pillow PyMuPDF pypdf
 ```
 
-## Current Input Support
+## 当前输入支持范围
 
-The bundled extractor currently supports PDF text extraction, LaTeX `.tex` section extraction, and candidate figure discovery. Word `.docx` extraction is not implemented yet. Markdown and plain text files may be read manually by an agent when relevant, but `extract_thesis_context.py` does not yet parse them into structured thesis sections.
+当前内置提取脚本主要支持 PDF 文本提取、LaTeX `.tex` 章节提取和候选图表扫描。Word `.docx` 提取尚未实现。Markdown 和纯文本文件可以由 Agent 在需要时手动读取参考，但 `extract_thesis_context.py` 目前还不会把它们解析成结构化论文上下文。
 
-## Install Locally
+## 本地安装
 
-Copy the skill folder into your Codex skills directory:
+将 Skill 复制到 Codex skills 目录：
 
 ```powershell
 Copy-Item -Recurse -Force `
@@ -123,26 +136,26 @@ Copy-Item -Recurse -Force `
   "$env:USERPROFILE\.codex\skills\thesis-defense-pptx"
 ```
 
-Then start a new Codex session and ask for a thesis defense PPTX, or explicitly mention:
+然后新开一个 Codex 会话，直接提出生成答辩 PPT 的需求，或明确说明：
 
 ```text
-Use the thesis-defense-pptx skill.
+使用 thesis-defense-pptx skill。
 ```
 
-## Core Workflow
+## 推荐流程
 
-1. Extract thesis context from local source files.
-2. Analyze the supplied PowerPoint template.
-3. Clone native template slides with PowerPoint COM.
-4. Fill concise defense content into editable PPTX shapes.
-5. Export slides to PNG.
-6. Create a contact sheet and inspect it.
-7. Run text overflow and stale-template checks.
-8. Iterate until the deck passes the quality gate.
+1. 从论文 PDF/LaTeX 项目中提取研究背景、方法、实验和结论。
+2. 分析用户提供的 PowerPoint 模板。
+3. 使用 PowerPoint COM 复制模板原生页面，生成 PPT 骨架。
+4. 将论文内容转写为答辩口径，填入可编辑文本框、表格和图表。
+5. 导出每页 PNG。
+6. 生成总览图并进行视觉检查。
+7. 检查文字溢出和旧模板词残留。
+8. 根据检查结果反复修复，直到通过质量门槛。
 
-## Example Commands
+## 常用命令
 
-Extract thesis context:
+提取论文上下文：
 
 ```powershell
 python .\skills\thesis-defense-pptx\scripts\extract_thesis_context.py `
@@ -150,7 +163,7 @@ python .\skills\thesis-defense-pptx\scripts\extract_thesis_context.py `
   --output "D:\path\to\thesis_context.md"
 ```
 
-Dump every slide's shapes/text/tables/pictures (recommended before any content fill, so you can copy exact strings into your replacement dicts):
+导出整套 PPT 的形状/文本/表格/图片清单（推荐在做任何内容替换前先跑一次，把精确字符串复制到替换字典里）：
 
 ```powershell
 python .\skills\thesis-defense-pptx\scripts\dump_pptx_content.py `
@@ -158,9 +171,9 @@ python .\skills\thesis-defense-pptx\scripts\dump_pptx_content.py `
   --output "D:\path\to\dump.md"
 ```
 
-Add `--slide 4,8,9` to dump only specific slides while iterating.
+可以加 `--slide 4,8,9` 只 dump 指定页，便于迭代调试。
 
-Export a deck to PNG:
+导出 PPTX 为逐页 PNG：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass `
@@ -170,7 +183,7 @@ powershell -NoProfile -ExecutionPolicy Bypass `
   -Width 1600 -Height 900
 ```
 
-Inspect text overflow:
+检查文字溢出：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass `
@@ -179,7 +192,7 @@ powershell -NoProfile -ExecutionPolicy Bypass `
   -Tolerance 40
 ```
 
-Create a contact sheet:
+生成总览图：
 
 ```powershell
 python .\skills\thesis-defense-pptx\scripts\make_contact_sheet.py `
@@ -187,18 +200,14 @@ python .\skills\thesis-defense-pptx\scripts\make_contact_sheet.py `
   --output "D:\path\to\contact_sheet.png"
 ```
 
-## Notes
+## 说明
 
-This skill intentionally does not ship a built-in slide template. It is meant to preserve the user's supplied template rather than impose a generic presentation style.
+本 Skill 不内置固定 PPT 模板。它的目标是尽量复用用户提供的模板，而不是强行套用通用设计风格。
 
-## License
+## 许可证
 
-This project is licensed under the [Apache License 2.0](LICENSE).
+本项目采用 [Apache License 2.0](LICENSE) 开源许可。
 
-Apache-2.0 allows use, modification, distribution, private use, and commercial
-use, subject to the license terms.
+Apache-2.0 允许使用、修改、分发、私有使用和商业使用，但需要遵守许可证条款。
 
-Commercial sustainability is intended to come from services, custom template
-adaptation, hosted workflows, enterprise support, template packs, and voluntary
-sponsorship rather than restricting use of the core skill. See
-[COMMERCIAL.md](COMMERCIAL.md).
+项目的商业化方向不是限制核心 skill 的使用，而是围绕服务、定制模板适配、托管流程、企业支持、模板包和自愿赞助来实现可持续发展。详见 [COMMERCIAL.md](COMMERCIAL.md)。
