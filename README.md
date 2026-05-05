@@ -193,4 +193,12 @@ This skill intentionally does not ship a built-in slide template. It is meant to
 
 ## License
 
-MIT License. See [LICENSE](LICENSE).
+This project is licensed for noncommercial use under the
+[PolyForm Noncommercial License 1.0.0](LICENSE).
+
+Commercial use requires a separate commercial license. See
+[COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md).
+
+This means the source code is publicly available and free for noncommercial
+learning, research, personal projects, and community use, but it is not an
+OSI-approved open-source license because commercial use is restricted.

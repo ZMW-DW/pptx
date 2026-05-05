@@ -191,4 +191,8 @@ python .\skills\thesis-defense-pptx\scripts\make_contact_sheet.py `
 
 ## 许可证
 
-MIT License，详见 [LICENSE](LICENSE)。
+本项目以 [PolyForm Noncommercial License 1.0.0](LICENSE) 授权非商业使用。
+
+商业使用需要单独取得商业授权，详见 [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md)。
+
+这意味着源码公开，允许非商业学习、研究、个人项目和社区使用；但由于限制商业使用，它不是 OSI 认可意义上的开源许可证，更准确地说是“源码可见 / 非商业免费使用”。
