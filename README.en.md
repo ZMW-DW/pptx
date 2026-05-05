@@ -17,6 +17,17 @@ contact sheet:
 
 ![preview contact sheet](examples/minimal_markdown/expected/contact_sheet.png)
 
+> The committed screenshot above is generated against a **real Zhengzhou
+> University defense/report PowerPoint template**, by passing it via
+> `--template`:
+> `python examples/minimal_markdown/run_example.py --template <your-real-template.pptx>`.
+> In that mode the script keeps the first 4 slides of the template as
+> `final.pptx`, **skips build_template / build_deck** (those assume the
+> generated demo skeleton), and runs only the three quality-gate scripts
+> (dump shape/text, scan stale words, PowerPoint-COM PNG export). Without
+> `--template`, the example falls back to the demo path that generates a
+> minimal in-memory template — fully reproducible, but visually plain.
+
 The example is intentionally cross-platform; real delivery still requires
 Microsoft PowerPoint on Windows for COM-based export and overflow inspection.
 

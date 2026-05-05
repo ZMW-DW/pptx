@@ -16,6 +16,15 @@ python examples/minimal_markdown/run_example.py
 
 ![预览总览图](examples/minimal_markdown/expected/contact_sheet.png)
 
+> 上图是用一份**真实的郑州大学开题/答辩 PowerPoint 模板**跑出来的 4 页拼图
+> （封面 / 目录 / 章节封面 / 内容页）。它通过 `--template` 参数指定模板生成：
+> `python examples/minimal_markdown/run_example.py --template <你的本地模板.pptx>`。
+> 该模式会把模板的前 4 页作为 `final.pptx`，**跳过 build_template / build_deck**
+> （它们假设的是脚本现场生成的轻量骨架），只跑 dump / scan / PowerPoint COM
+> 导出 PNG 三个 quality gate 工具，因此能真实展示 skill 在严格学校模板上
+> 的视觉效果与扫描发现的占位词残留。不传 `--template` 时则走默认 demo
+> 路径（生成 sample 模板 + 跑 build_deck），输出更简化但完全可重现。
+
 > 该示例不依赖 Microsoft PowerPoint，因此 macOS / Linux / Windows 都能跑通。
 > 真实交付仍建议在 Windows + PowerPoint 下走 COM 导出和文字溢出检查。
 

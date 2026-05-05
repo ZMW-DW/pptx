@@ -54,6 +54,31 @@ examples/minimal_markdown/
 └── contact_sheet.png
 ```
 
+### 用真实学校模板跑
+
+不传参数时走的是"build_template + build_deck"这条 demo 路径，输出可重现
+但视觉简陋。如果你想看 skill 在**真实学校模板**上的效果（也就是仓库里
+`expected/contact_sheet.png` 那张图的来源），传一个本地的 `.pptx` 模板
+路径即可：
+
+```bash
+python examples/minimal_markdown/run_example.py \
+    --template /path/to/your-real-template.pptx
+```
+
+`--template` 模式做的事情是有意收缩的：
+
+1. 截取你模板的前 4 页保存成 `final.pptx`；
+2. **跳过 `build_template.py` / `build_deck.py`**（这两个假设的是 demo
+   级骨架，对 10-20MB 的真实模板做 `clear_slide` 会破坏 part 关系，
+   PowerPoint 会拒绝打开生成的 final.pptx）；
+3. 跑 `dump_pptx_content.py` + `scan_pptx_text.py` + 真实 PowerPoint
+   COM 导出 PNG + `make_contact_sheet.py`，把这三个 quality gate 工具
+   作用在你真实模板上。
+
+模板本身**不**会被 commit（已在 `.gitignore` 里），仅产出落到
+`examples/minimal_markdown/`。
+
 ## 预览
 
 下面是本示例生成的参考总览图：

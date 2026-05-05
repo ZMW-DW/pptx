@@ -5,9 +5,20 @@ official `export_pptx_png.ps1` to produce a faithful visual preview. On
 environments without PowerPoint (Linux / macOS / minimal Windows), it falls
 back to `render_preview.py`, which now renders a deliberately spartan
 placeholder so the contact sheet does NOT misrepresent the generated PPTX.
+
+Optional: pass --template <path-to-real.pptx> to run the example against a
+real institutional PowerPoint template. In that mode the script does NOT
+touch build_template.py / build_deck.py — those two are demo-grade and assume
+a clean 4-page generated skeleton. Instead it keeps the first 4 slides of
+your real template and runs the three quality-gate scripts (dump shape/text,
+scan stale words, export real PowerPoint PNGs) against the template directly,
+producing the contact sheet shipped in expected/contact_sheet.png. Real
+templates are never committed; only run artifacts under
+examples/minimal_markdown/ are produced.
 """
 from __future__ import annotations
 
+import argparse
 import shutil
 import subprocess
 import sys
@@ -24,9 +35,15 @@ REPO_ROOT = HERE.parent.parent
 SCRIPTS = REPO_ROOT / "skills" / "thesis-defense-pptx" / "scripts"
 
 EXPORT_PS1 = SCRIPTS / "export_pptx_png.ps1"
+SAMPLE_TEMPLATE = HERE / "sample_template.pptx"
 FINAL_PPTX = HERE / "final.pptx"
 RENDERED_DIR = HERE / "rendered_slides"
 CONTACT_SHEET = HERE / "contact_sheet.png"
+
+# Number of slides build_deck.py rebuilds (cover + background + method + result).
+# When --template points at a deck with more slides, we truncate down to this
+# count so make_contact_sheet doesn't end up rendering 20+ unrelated pages.
+PREVIEW_SLIDES = 4
 
 
 def run(cmd: list[str]) -> None:
@@ -85,9 +102,56 @@ def export_with_powerpoint() -> bool:
         return False
 
 
+def truncate_pptx_to_first_n_slides(src: Path, dst: Path, n: int) -> int:
+    """Copy ``src`` to ``dst`` keeping only the first ``n`` entries in sldIdLst.
+
+    python-pptx does not expose slide deletion, so we manipulate the
+    sldIdLst XML directly. The underlying slideN.xml parts remain inside the
+    package zip but PowerPoint only renders slides referenced by sldIdLst,
+    which is exactly what we want for the example. Returns the number of
+    slides actually kept.
+    """
+    from pptx import Presentation
+
+    prs = Presentation(str(src))
+    sld_id_lst = prs.slides._sldIdLst
+    children = list(sld_id_lst)
+    for child in children[n:]:
+        sld_id_lst.remove(child)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    prs.save(str(dst))
+    return min(n, len(children))
+
+
 def main() -> int:
-    run([sys.executable, str(HERE / "build_template.py")])
-    run([sys.executable, str(HERE / "build_deck.py")])
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--template",
+        default=None,
+        help=(
+            "Optional path to a real .pptx template. In this mode build_deck.py "
+            "is skipped (it assumes the demo skeleton produced by "
+            "build_template.py and would corrupt complex real-world slides). "
+            f"The first {PREVIEW_SLIDES} slides of the template become "
+            "final.pptx and the dump / scan / export quality-gate scripts run "
+            "against the template directly."
+        ),
+    )
+    args = parser.parse_args()
+
+    if args.template:
+        custom = Path(args.template).expanduser().resolve()
+        if not custom.is_file():
+            print(f"--template path not found: {custom}")
+            return 2
+        kept = truncate_pptx_to_first_n_slides(custom, FINAL_PPTX, PREVIEW_SLIDES)
+        print(f"using custom template: {custom}")
+        print(f"  kept first {kept} slides -> {FINAL_PPTX}")
+        print("  (build_template / build_deck skipped: --template runs the")
+        print("   dump/scan/export quality gates against the real template)")
+    else:
+        run([sys.executable, str(HERE / "build_template.py")])
+        run([sys.executable, str(HERE / "build_deck.py")])
     run([
         sys.executable,
         str(SCRIPTS / "dump_pptx_content.py"),
