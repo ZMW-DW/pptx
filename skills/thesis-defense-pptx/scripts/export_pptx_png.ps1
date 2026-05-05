@@ -12,8 +12,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Windows 默认 console 是 cp936/gbk，输出含中文路径或特殊符号的 JSON 会乱码。
-# 强制切到 UTF-8 让 stdout 稳定可读。
+# Windows console defaults to cp936/gbk; force UTF-8 so JSON with Chinese
+# paths or special characters stays readable on stdout.
 try {
     [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
     $OutputEncoding = [System.Text.Encoding]::UTF8
