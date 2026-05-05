@@ -193,12 +193,12 @@ This skill intentionally does not ship a built-in slide template. It is meant to
 
 ## License
 
-This project is licensed for noncommercial use under the
-[PolyForm Noncommercial License 1.0.0](LICENSE).
+This project is licensed under the [Apache License 2.0](LICENSE).
 
-Commercial use requires a separate commercial license. See
-[COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md).
+Apache-2.0 allows use, modification, distribution, private use, and commercial
+use, subject to the license terms.
 
-This means the source code is publicly available and free for noncommercial
-learning, research, personal projects, and community use, but it is not an
-OSI-approved open-source license because commercial use is restricted.
+Commercial sustainability is intended to come from services, custom template
+adaptation, hosted workflows, enterprise support, template packs, and voluntary
+sponsorship rather than restricting use of the core skill. See
+[COMMERCIAL.md](COMMERCIAL.md).
