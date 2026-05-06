@@ -13,20 +13,33 @@ python examples/minimal_markdown/run_example.py
 
 It builds a tiny template, generates an editable defense deck, dumps the
 deck's text/shape inventory, scans for stale template words, and writes a
-contact sheet:
+contact sheet. The four committed reference images below come from a full run
+against a **real Zhengzhou University defense/report PowerPoint template**:
 
-![preview contact sheet](examples/minimal_markdown/expected/contact_sheet.png)
+![Slides 1-10 overview](examples/minimal_markdown/expected/contact_sheet_01_10.png)
 
-> The committed screenshot above is generated against a **real Zhengzhou
-> University defense/report PowerPoint template**, by passing it via
-> `--template`:
-> `python examples/minimal_markdown/run_example.py --template <your-real-template.pptx>`.
-> In that mode the script keeps the first 4 slides of the template as
-> `final.pptx`, **skips build_template / build_deck** (those assume the
-> generated demo skeleton), and runs only the three quality-gate scripts
-> (dump shape/text, scan stale words, PowerPoint-COM PNG export). Without
-> `--template`, the example falls back to the demo path that generates a
-> minimal in-memory template — fully reproducible, but visually plain.
+![Slides 11-19 and 21 overview](examples/minimal_markdown/expected/contact_sheet_11_20.png)
+
+![Cover detail](examples/minimal_markdown/expected/detail_slide_01.png)
+
+![Content-slide detail](examples/minimal_markdown/expected/detail_slide_14.png)
+
+> They were generated with:
+>
+> ```bash
+> python examples/minimal_markdown/run_example.py \
+>     --template <your-real-template.pptx> \
+>     --full \
+>     --expected-exclude-slides "20" \
+>     --detail-slides "1,14"
+> ```
+>
+> In `--template` mode the script **skips build_template / build_deck**
+> because those only target the generated demo skeleton. Real template pages
+> are kept natively and then passed through dump / scan / PowerPoint-COM PNG
+> export / contact-sheet quality gates. Slide 20 is a QR-code promotional page
+> from the shared template; it remains in `final.pptx` and the exported PNGs
+> for full-deck checking, but is excluded from the public README contact sheets.
 
 The example is intentionally cross-platform; real delivery still requires
 Microsoft PowerPoint on Windows for COM-based export and overflow inspection.
