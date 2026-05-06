@@ -23,10 +23,10 @@ examples/minimal_markdown/
 ├── render_preview.py          # 纯 Python 生成示意 slide PNG
 ├── run_example.py             # 一键跑完整示例
 └── expected/
-    ├── contact_sheet_01_10.png # 真实模板 slides 1-10 总览图
-    ├── contact_sheet_11_20.png # 真实模板 slides 11-19 + 21 总览图
+    ├── generated_overview_01.png # 生成后 slides 1-4 总览图
+    ├── generated_overview_02.png # 生成后 slides 5-8 总览图
     ├── detail_slide_01.png     # 封面细节图
-    ├── detail_slide_14.png     # 内容页细节图
+    ├── detail_slide_06.png     # 方法页细节图
     └── README.md
 ```
 
@@ -61,31 +61,26 @@ examples/minimal_markdown/
 
 不传参数时走的是"build_template + build_deck"这条 demo 路径，输出可重现
 但视觉简陋。如果你想看 skill 在**真实学校模板**上的效果（也就是仓库里
-`expected/contact_sheet_01_10.png` / `expected/contact_sheet_11_20.png`
+`expected/generated_overview_01.png` / `expected/generated_overview_02.png`
 和两张 detail 图的来源），传一个本地的 `.pptx` 模板路径即可：
 
 ```bash
 python examples/minimal_markdown/run_example.py \
     --template /path/to/your-real-template.pptx \
-    --full \
-    --expected-exclude-slides "20" \
-    --detail-slides "1,14"
+    --detail-slides "1,6"
 ```
 
-`--template` 模式做的事情是有意收缩的：
+`--template` 模式会调用 `build_deck.py --real-template`：
 
-1. 不传 `--full` 时截取你模板的前 4 页保存成 `final.pptx`；传 `--full`
-   时保留整份模板；
-2. **跳过 `build_template.py` / `build_deck.py`**（这两个假设的是 demo
-   级骨架，对 10-20MB 的真实模板做 `clear_slide` 会破坏 part 关系，
-   PowerPoint 会拒绝打开生成的 final.pptx）；
-3. 跑 `dump_pptx_content.py` + `scan_pptx_text.py` + 真实 PowerPoint
-   COM 导出 PNG + `make_contact_sheet.py`，把这三个 quality gate 工具
-   作用在你真实模板上。
+1. 打开真实 `.pptx` 模板，但不清空其中的复杂 shape，避免破坏图片、组合对象
+   或嵌入素材的关系；
+2. 在模板原生页面上覆盖 `thesis.md` 生成的示例内容，输出真正可编辑的
+   `final.pptx`；
+3. 对生成后的 `final.pptx` 跑 `dump_pptx_content.py`、`scan_pptx_text.py`、
+   PowerPoint COM 导出 PNG 和 `make_contact_sheet.py`。
 
-`--expected-exclude-slides "20"` 只影响 README 用的 `expected/` 缩略合集图。
-第 20 页仍保留在 `final.pptx` 和 `rendered_slides/` 里参与完整检查；它只是该
-公开模板自带的二维码推广页，不适合放进 README 展示图。
+README 里的图不是模板原页截图；每页右上角都有 `Generated from thesis.md`
+标记，用来说明这些页面已经经过 example 生成流程。
 
 模板本身**不**会被 commit（已在 `.gitignore` 里），仅产出落到
 `examples/minimal_markdown/`。
@@ -94,13 +89,13 @@ python examples/minimal_markdown/run_example.py \
 
 下面是本示例基于真实模板生成的参考图：
 
-![Slides 1-10 overview](expected/contact_sheet_01_10.png)
+![Generated slides 1-4 overview](expected/generated_overview_01.png)
 
-![Slides 11-19 and 21 overview](expected/contact_sheet_11_20.png)
+![Generated slides 5-8 overview](expected/generated_overview_02.png)
 
 ![Cover detail](expected/detail_slide_01.png)
 
-![Content-slide detail](expected/detail_slide_14.png)
+![Method-slide detail](expected/detail_slide_06.png)
 
 ## 示例覆盖了哪些能力
 

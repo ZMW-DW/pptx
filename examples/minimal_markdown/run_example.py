@@ -7,14 +7,11 @@ back to `render_preview.py`, which now renders a deliberately spartan
 placeholder so the contact sheet does NOT misrepresent the generated PPTX.
 
 Optional: pass --template <path-to-real.pptx> to run the example against a
-real institutional PowerPoint template. In that mode the script does NOT
-touch build_template.py / build_deck.py — those two are demo-grade and assume
-a clean 4-page generated skeleton. Instead it keeps the first N slides of
-your real template (default 4, raise with --max-slides or pass --full to keep
-the entire deck) and runs the three quality-gate scripts (dump shape/text,
-scan stale words, export real PowerPoint PNGs) against the template directly.
-In --full mode it can also write README-friendly expected contact sheets and
-detail snapshots from the exported PowerPoint PNGs.
+real institutional PowerPoint template. In that mode build_deck.py overlays
+the generated thesis.md example content onto native template pages, producing
+an editable final.pptx that is genuinely generated from the example input.
+The script then runs dump / scan / PowerPoint PNG export / contact-sheet
+quality gates against that generated deck.
 Real templates are never committed; only run artifacts under
 examples/minimal_markdown/ are produced.
 """
@@ -43,11 +40,6 @@ FINAL_PPTX = HERE / "final.pptx"
 RENDERED_DIR = HERE / "rendered_slides"
 CONTACT_SHEET = HERE / "contact_sheet.png"
 EXPECTED_DIR = HERE / "expected"
-
-# Default number of slides kept when --template is given without --full /
-# --max-slides (matches the 4-page demo skeleton from build_deck.py).
-DEFAULT_PREVIEW_SLIDES = 4
-
 
 def slide_number(path: Path) -> int:
     """Extract a 1-based slide number from PowerPoint-exported PNG names."""
@@ -124,34 +116,8 @@ def export_with_powerpoint() -> bool:
         return False
 
 
-def truncate_pptx_to_first_n_slides(src: Path, dst: Path, n: int | None) -> int:
-    """Copy ``src`` to ``dst``, optionally keeping only the first ``n`` slides.
-
-    python-pptx does not expose slide deletion, so we manipulate the
-    sldIdLst XML directly. The underlying slideN.xml parts remain inside the
-    package zip but PowerPoint only renders slides referenced by sldIdLst,
-    which is exactly what we want for the example. Pass ``n=None`` to keep
-    the whole deck. Returns the number of slides actually kept.
-    """
-    from pptx import Presentation
-
-    prs = Presentation(str(src))
-    sld_id_lst = prs.slides._sldIdLst
-    children = list(sld_id_lst)
-    total = len(children)
-    if n is not None:
-        for child in children[n:]:
-            sld_id_lst.remove(child)
-        kept = min(n, total)
-    else:
-        kept = total
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    prs.save(str(dst))
-    return kept
-
-
-def write_expected_contact_sheet(files: list[Path], output: Path) -> None:
-    """Write a README-friendly 5-column contact sheet for a slide subset."""
+def write_expected_contact_sheet(files: list[Path], output: Path, *, cols: int = 2) -> None:
+    """Write a README-friendly contact sheet for a generated slide subset."""
     from PIL import Image, ImageDraw, ImageFont
 
     def label_font() -> ImageFont.ImageFont:
@@ -166,8 +132,7 @@ def write_expected_contact_sheet(files: list[Path], output: Path) -> None:
                 continue
         return ImageFont.load_default()
 
-    cols = 5
-    thumb_w, thumb_h = 560, 315
+    thumb_w, thumb_h = 760, 428
     margin = 22
     label_h = 28
     rows = (len(files) + cols - 1) // cols
@@ -201,30 +166,8 @@ def main() -> int:
         default=None,
         help=(
             "Optional path to a real .pptx template. In this mode build_deck.py "
-            "is skipped (it assumes the demo skeleton produced by "
-            "build_template.py and would corrupt complex real-world slides). "
-            "By default the first 4 slides become final.pptx; raise this with "
-            "--max-slides or pass --full to keep the whole deck."
-        ),
-    )
-    parser.add_argument(
-        "--full",
-        action="store_true",
-        help=(
-            "Keep every slide of the --template deck. Combine with "
-            "--max-slides N to keep all slides up to N (handy for excluding "
-            "promotional last pages such as QR-code shoutouts that "
-            "community-shared templates often append)."
-        ),
-    )
-    parser.add_argument(
-        "--max-slides",
-        type=int,
-        default=None,
-        help=(
-            "Upper bound on slides kept from --template. When omitted, the "
-            f"default is {DEFAULT_PREVIEW_SLIDES} for the small demo path, "
-            "or unbounded when --full is set."
+            "overlays thesis.md example content onto native template pages "
+            "and writes a generated final.pptx."
         ),
     )
     parser.add_argument(
@@ -233,7 +176,7 @@ def main() -> int:
         default=None,
         help=(
             "Override columns in the final contact sheet. Defaults to 2 for "
-            "the demo path / small decks and 5 when running with --full."
+            "small generated decks and 5 for larger decks."
         ),
     )
     parser.add_argument(
@@ -242,18 +185,8 @@ def main() -> int:
         help=(
             "Comma-separated 1-based slide numbers to also save as "
             "expected/detail_slide_NN.png (e.g. '1,5'). When omitted in "
-            "--full mode the script picks the cover (slide 1) plus the first "
-            "content slide (slide 5)."
-        ),
-    )
-    parser.add_argument(
-        "--expected-exclude-slides",
-        default="",
-        help=(
-            "Comma-separated 1-based slide numbers to omit only from the "
-            "README expected contact sheets written in --full mode. The "
-            "slides are still kept in final.pptx and still go through dump / "
-            "scan / export quality gates."
+            "--template mode the script writes detail snapshots for slides 1 "
+            "and 5."
         ),
     )
     args = parser.parse_args()
@@ -263,26 +196,16 @@ def main() -> int:
         if not custom.is_file():
             print(f"--template path not found: {custom}")
             return 2
-        # Resolve final "keep N" semantics:
-        #   - --max-slides N always wins (acts as an upper bound, even with --full)
-        #   - --full alone keeps everything
-        #   - neither: small demo (DEFAULT_PREVIEW_SLIDES)
-        if args.max_slides is not None:
-            keep_n = max(1, args.max_slides)
-        elif args.full:
-            keep_n = None
-        else:
-            keep_n = DEFAULT_PREVIEW_SLIDES
-        kept = truncate_pptx_to_first_n_slides(custom, FINAL_PPTX, keep_n)
         print(f"using custom template: {custom}")
-        if keep_n is None:
-            print(f"  kept all {kept} slides (--full) -> {FINAL_PPTX}")
-        elif args.full:
-            print(f"  kept first {kept} slides (--full + --max-slides {keep_n}) -> {FINAL_PPTX}")
-        else:
-            print(f"  kept first {kept} slides -> {FINAL_PPTX}")
-        print("  (build_template / build_deck skipped: --template runs the")
-        print("   dump/scan/export quality gates against the real template)")
+        run([
+            sys.executable,
+            str(HERE / "build_deck.py"),
+            "--template",
+            str(custom),
+            "--out",
+            str(FINAL_PPTX),
+            "--real-template",
+        ])
     else:
         run([sys.executable, str(HERE / "build_template.py")])
         run([sys.executable, str(HERE / "build_deck.py")])
@@ -335,7 +258,7 @@ def main() -> int:
         "450",
     ])
 
-    if args.detail_slides or args.full:
+    if args.detail_slides or args.template:
         # Re-extract the rendered list ordered by slide number so that
         # "slide 1" really maps to the first rendered slide (PowerPoint emits
         # locale-named files like "幻灯片1.PNG" in non-zero-padded order).
@@ -361,25 +284,18 @@ def main() -> int:
                 shutil.copyfile(src, dst)
                 print(f"detail snapshot: {dst}")
 
-        if args.full:
-            excluded = {
-                int(x)
-                for x in args.expected_exclude_slides.split(",")
-                if x.strip()
-            }
-            readme_slides = [
-                p for p in rendered_sorted
-                if slide_number(p) not in excluded
-            ]
-            if readme_slides:
+        if args.template:
+            if rendered_sorted:
                 write_expected_contact_sheet(
-                    readme_slides[:10],
-                    EXPECTED_DIR / "contact_sheet_01_10.png",
+                    rendered_sorted[:4],
+                    EXPECTED_DIR / "generated_overview_01.png",
+                    cols=2,
                 )
-            if len(readme_slides) > 10:
+            if len(rendered_sorted) > 4:
                 write_expected_contact_sheet(
-                    readme_slides[10:20],
-                    EXPECTED_DIR / "contact_sheet_11_20.png",
+                    rendered_sorted[4:8],
+                    EXPECTED_DIR / "generated_overview_02.png",
+                    cols=2,
                 )
 
     print()

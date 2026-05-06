@@ -13,31 +13,29 @@ python examples/minimal_markdown/run_example.py
 ```
 
 脚本会现场生成模板、可编辑 PPTX、dump 结构、scan 旧词，并输出 PPT 总览图。
-下面四张参考图来自一份**真实的郑州大学开题/答辩 PowerPoint 模板**全量运行结果：
+下面四张参考图来自一份**真实的郑州大学开题/答辩 PowerPoint 模板**，但画面不是
+模板原页截图，而是 `thesis.md` 示例内容被生成进模板后的 `final.pptx` 渲染结果：
 
-![Slides 1-10 总览](examples/minimal_markdown/expected/contact_sheet_01_10.png)
+![生成示例 slides 1-4 总览](examples/minimal_markdown/expected/generated_overview_01.png)
 
-![Slides 11-19 和 21 总览](examples/minimal_markdown/expected/contact_sheet_11_20.png)
+![生成示例 slides 5-8 总览](examples/minimal_markdown/expected/generated_overview_02.png)
 
 ![封面细节](examples/minimal_markdown/expected/detail_slide_01.png)
 
-![内容页细节](examples/minimal_markdown/expected/detail_slide_14.png)
+![方法页细节](examples/minimal_markdown/expected/detail_slide_06.png)
 
-> 这些图通过 `--template --full` 指定本地真实模板生成：
+> 这些图通过 `--template` 指定本地真实模板生成：
 >
 > ```bash
 > python examples/minimal_markdown/run_example.py \
 >     --template <你的本地模板.pptx> \
->     --full \
->     --expected-exclude-slides "20" \
->     --detail-slides "1,14"
+>     --detail-slides "1,6"
 > ```
 >
-> `--template` 模式会**跳过 build_template / build_deck**，因为这两个脚本只面向
-> 现场生成的轻量骨架；真实模板则直接保留原生页面，并跑 dump / scan /
-> PowerPoint COM 导出 PNG / contact sheet 这些 quality gate。第 20 页是模板
-> 分享渠道二维码推广页，仍保留在全量 `final.pptx` 和导出结果里参与检查，但
-> 不放进 README 缩略合集图。
+> `--template` 模式会调用 `build_deck.py --real-template`：不清空真实模板里的
+> 复杂 shape，而是在模板页面上覆盖 `thesis.md` 生成的示例内容，输出真正可编辑
+> 的 `final.pptx`。README 图片来自 PowerPoint COM 对这个生成后 deck 的真实
+> 渲染；每页右上角的 `Generated from thesis.md` 标记用于避免和模板原页截图混淆。
 
 > 该示例不依赖 Microsoft PowerPoint，因此 macOS / Linux / Windows 都能跑通。
 > 真实交付仍建议在 Windows + PowerPoint 下走 COM 导出和文字溢出检查。

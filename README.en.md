@@ -13,33 +13,34 @@ python examples/minimal_markdown/run_example.py
 
 It builds a tiny template, generates an editable defense deck, dumps the
 deck's text/shape inventory, scans for stale template words, and writes a
-contact sheet. The four committed reference images below come from a full run
-against a **real Zhengzhou University defense/report PowerPoint template**:
+contact sheet. The four committed reference images below use a **real
+Zhengzhou University defense/report PowerPoint template**, but they are not
+raw template-page screenshots; they are PowerPoint-COM renders of the
+generated `final.pptx` after `thesis.md` content has been overlaid onto the
+template:
 
-![Slides 1-10 overview](examples/minimal_markdown/expected/contact_sheet_01_10.png)
+![Generated slides 1-4 overview](examples/minimal_markdown/expected/generated_overview_01.png)
 
-![Slides 11-19 and 21 overview](examples/minimal_markdown/expected/contact_sheet_11_20.png)
+![Generated slides 5-8 overview](examples/minimal_markdown/expected/generated_overview_02.png)
 
 ![Cover detail](examples/minimal_markdown/expected/detail_slide_01.png)
 
-![Content-slide detail](examples/minimal_markdown/expected/detail_slide_14.png)
+![Method-slide detail](examples/minimal_markdown/expected/detail_slide_06.png)
 
 > They were generated with:
 >
 > ```bash
 > python examples/minimal_markdown/run_example.py \
 >     --template <your-real-template.pptx> \
->     --full \
->     --expected-exclude-slides "20" \
->     --detail-slides "1,14"
+>     --detail-slides "1,6"
 > ```
 >
-> In `--template` mode the script **skips build_template / build_deck**
-> because those only target the generated demo skeleton. Real template pages
-> are kept natively and then passed through dump / scan / PowerPoint-COM PNG
-> export / contact-sheet quality gates. Slide 20 is a QR-code promotional page
-> from the shared template; it remains in `final.pptx` and the exported PNGs
-> for full-deck checking, but is excluded from the public README contact sheets.
+> In `--template` mode the script calls `build_deck.py --real-template`: it
+> does not clear complex shapes from the real template. Instead, it overlays
+> generated `thesis.md` content onto native template pages and writes an
+> editable `final.pptx`. The README images are faithful PowerPoint-COM renders
+> of that generated deck; the `Generated from thesis.md` badge prevents them
+> from being mistaken for raw template screenshots.
 
 The example is intentionally cross-platform; real delivery still requires
 Microsoft PowerPoint on Windows for COM-based export and overflow inspection.
