@@ -109,12 +109,6 @@ This repository is not a fork of `ppt-master`, does not vendor `ppt-master`, and
 
 Users are responsible for making sure they have the right to use their thesis text, figures, school templates, logos, and any third-party materials included in the generated deck.
 
-## Community
-
-[LINUX DO — 中文开发者社区](https://linux.do/)
-
-This project recognizes and appreciates LINUX DO as a Chinese developer community for open-source sharing and technical discussion. This acknowledgement is not a claim of official endorsement unless separately stated by the community.
-
 ## Repository Layout
 
 ```text
@@ -245,3 +239,9 @@ Commercial sustainability is intended to come from services, custom template
 adaptation, hosted workflows, enterprise support, template packs, and voluntary
 sponsorship rather than restricting use of the core skill. See
 [COMMERCIAL.md](COMMERCIAL.md).
+
+## Community
+
+[LINUX DO — 中文开发者社区](https://linux.do/)
+
+This project recognizes and appreciates LINUX DO as a Chinese developer community for open-source sharing and technical discussion. This acknowledgement is not a claim of official endorsement unless separately stated by the community.
