@@ -12,10 +12,12 @@ Use this skill for local, editable `.pptx` thesis defense decks that must follow
 - Platform: Windows + Microsoft PowerPoint for COM-driven cloning, export, and overflow inspection. On macOS/Linux, use the python-pptx-only parts and skip COM-based quality gates.
 - Treat the visual template as the source of truth. Preserve its cover, colors, fonts, navigation, card styles, logos, and slide proportions unless the user explicitly asks to redesign.
 - Read the thesis source first: PDF, LaTeX, figures, old PPT, experiment scripts, tables, and captions. Do not generate from topic/title alone when source files exist.
+- Build a source-asset inventory before placing images: extract `\includegraphics` entries and captions from the final TeX/PDF, then use only thesis-cited figures or images the user explicitly approves. Do not carry over pictures from a template, old progress deck, or draft figure folder merely because they look relevant.
 - Prefer copying native template slides and replacing content over rebuilding from blank slides.
 - Keep slides concise and presentation-oriented. Convert thesis prose into defense talking points.
+- Preserve the template's font sizes and hierarchy by default. For projection readability, first shorten text, split dense slides, or use the template's larger existing layouts; only change font sizes locally when the template itself provides no readable fit.
 - Always generate an editable `.pptx`, not only an outline, image deck, PDF, or HTML.
-- Always run a visual quality gate before final response: export slide images, inspect a contact sheet, check text overflow, check stale template words, and verify the PPTX opens.
+- Always run a visual quality gate before final response: export slide images, inspect a contact sheet plus key full-size slide screenshots, check text overflow, check stale template words/images, and verify the PPTX opens.
 
 ## Recommended Workflow
 
@@ -28,6 +30,7 @@ Use this skill for local, editable `.pptx` thesis defense decks that must follow
 2. Extract thesis context:
    - Use `scripts/extract_thesis_context.py` to summarize PDF/TeX text and list candidate figures.
    - Read source files directly when details matter: abstract, introduction, method, experiments, results, conclusion.
+   - Create an explicit list of final-thesis figures from `\includegraphics` and captions. Treat this as the allow-list for PPT images unless the user requests new visuals.
    - Collect defense-critical facts: problem, motivation, modeling, algorithms, experimental setup, baselines, metrics, key results, limitations, future work.
 
 3. Analyze the template:
@@ -43,15 +46,17 @@ Use this skill for local, editable `.pptx` thesis defense decks that must follow
 5. Fill content:
    - Use 12-16 slides for undergraduate defense unless user specifies otherwise.
    - Typical order: cover, TOC, background, problem definition, work summary, system/method, modeling, implementation, experiment setup, training/results, comparison, robustness/multi-seed, innovation/limitations, summary/outlook, thanks.
-   - Use thesis figures first. If generating new visuals, keep them simple and consistent with the template.
-   - Keep dense tables limited to headline metrics; move detailed prose into verbal notes or omit.
+   - Use final-thesis figures first and verify each inserted picture against the source-asset inventory. If a picture is from a template or old deck and is not thesis-cited, replace it or remove it.
+   - Keep dense tables limited to headline metrics; move detailed prose into verbal notes or omit. Prefer one message per slide, large existing template placeholders, metric cards, and short bullets over shrinking text or adding small multi-column tables.
+   - Match the template's typography before changing sizes: preserve title/body/table/navigation sizing where possible, and use content reduction or slide splitting before manual font scaling.
 
 6. Quality gate:
    - Export final PPTX to PNG with `scripts/export_pptx_png.ps1`.
    - Create a contact sheet with `scripts/make_contact_sheet.py`.
    - Run `scripts/inspect_pptx_overflow.ps1`.
    - Run `scripts/scan_pptx_text.py` for slide count and stale template terms.
-   - Check stale template text, placeholders, wrong names/dates, wrong navigation labels, red active-nav white text, image aspect ratios, and text/card overlap.
+   - Inspect the contact sheet manually, then open any risky slide full-size. COM overflow is not sufficient: also check visible clipping, text crossing card borders, small text caused by overfilling, stale template images, image aspect ratios, and text/card overlap.
+   - Check stale template text, placeholders, wrong names/dates, wrong navigation labels, red active-nav white text, and non-thesis images accidentally inherited from the template or old progress deck.
    - Fix and repeat until the exported deck is clean.
 
 7. Final response:
