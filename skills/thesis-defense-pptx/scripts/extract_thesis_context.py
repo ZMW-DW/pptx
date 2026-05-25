@@ -104,7 +104,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Extract thesis context from a PDF/LaTeX project.")
     parser.add_argument("--input", required=True, help="Thesis PDF, source file, or project directory")
     parser.add_argument("--output", required=True, help="Markdown output path")
-    parser.add_argument("--max-pages", type=int, default=80, help="Maximum PDF pages to extract")
+    parser.add_argument("--max-pages", type=int, default=120, help="Maximum PDF pages to extract")
     args = parser.parse_args()
 
     root = Path(args.input).expanduser().resolve()
@@ -126,7 +126,7 @@ def main() -> int:
         lines.append(f"Source: `{main_pdf}`")
         lines.append("")
         try:
-            lines.append(clean_text(read_pdf(main_pdf, args.max_pages))[:30000])
+            lines.append(clean_text(read_pdf(main_pdf, args.max_pages))[:60000])
         except Exception as exc:
             lines.append(f"PDF extraction failed: {exc}")
         lines.append("")
