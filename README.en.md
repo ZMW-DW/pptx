@@ -13,34 +13,28 @@ python examples/minimal_markdown/run_example.py
 
 It builds a tiny template, generates an editable defense deck, dumps the
 deck's text/shape inventory, scans for stale template words, and writes a
-contact sheet. The four committed reference images below use a **real
-Zhengzhou University defense/report PowerPoint template**, but they are not
-raw template-page screenshots; they are PowerPoint-COM renders of the
-generated `final.pptx` after `thesis.md` content has been overlaid onto the
-template:
+contact sheet. The images below show the built-in **Harbin University of
+Commerce (HRBCU) defense template** — cleaned of personal content with
+Chinese placeholders throughout:
 
-![Generated slides 1-4 overview](examples/minimal_markdown/expected/generated_overview_01.png)
+![Template preview](examples/minimal_markdown/expected/template_preview_01.png)
 
-![Generated slides 5-8 overview](examples/minimal_markdown/expected/generated_overview_02.png)
+![Template preview](examples/minimal_markdown/expected/template_preview_02.png)
 
-![Cover detail](examples/minimal_markdown/expected/detail_slide_01.png)
+![Template preview](examples/minimal_markdown/expected/template_preview_03.png)
 
-![Method-slide detail](examples/minimal_markdown/expected/detail_slide_06.png)
+![Template preview](examples/minimal_markdown/expected/template_preview_04.png)
 
-> They were generated with:
+![Template preview](examples/minimal_markdown/expected/template_preview_05.png)
+
+> The images above show the cleaned HRBCU template as-is. HRBCU students from
+> the same school/advisor can use it directly. Others should supply their own
+> `.pptx` template:
 >
 > ```bash
 > python examples/minimal_markdown/run_example.py \
->     --template <your-real-template.pptx> \
->     --detail-slides "1,6"
+>     --template <your-real-template.pptx>
 > ```
->
-> In `--template` mode the script calls `build_deck.py --real-template`: it
-> does not clear complex shapes from the real template. Instead, it overlays
-> generated `thesis.md` content onto native template pages and writes an
-> editable `final.pptx`. The README images are faithful PowerPoint-COM renders
-> of that generated deck; the `Generated from thesis.md` badge prevents them
-> from being mistaken for raw template screenshots.
 
 The example is intentionally cross-platform; real delivery still requires
 Microsoft PowerPoint on Windows for COM-based export and overflow inspection.

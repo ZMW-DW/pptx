@@ -17,7 +17,7 @@
 
 ## 为什么需要这个 Skill
 
-很多 AI PPT 工具擅长从文档重新设计一套新风格 PPT。但毕业论文答辩经常有相反的需求：学校或学院已经给了 `.pptx` 模板，封面、校徽、郑大红配色、顶部导航、卡片式正文、字体大小都不希望被改掉，只需要把论文内容转成适合答辩展示的表达。
+很多 AI PPT 工具擅长从文档重新设计一套新风格 PPT。但毕业论文答辩经常有相反的需求：学校或学院已经给了 `.pptx` 模板，封面、校徽、配色、顶部导航、卡片式正文、字体大小都不希望被改掉，只需要把论文内容转成适合答辩展示的表达。
 
 本 Skill 针对的正是这种“严格套用现成模板”的工作流：
 
@@ -182,7 +182,7 @@ python .\skills\thesis-defense-pptx\scripts\make_contact_sheet.py `
 
 ## 说明
 
-本 Skill 内置了一份哈尔滨商业大学（HRBCU）的通用答辩模板（`skills/thesis-defense-pptx/templates/HRBCU-defense-template.pptx`），来自真实答辩 PPTX 并经过去个人化处理，保留全部视觉结构。同校/同导师的同学可直接使用。其他学校的用户仍需提供自己的 `.pptx` 模板。
+本 Skill 内置了一份哈尔滨商业大学（HRBCU）的通用答辩模板（`skills/thesis-defense-pptx/templates/HRBCU-defense-template.pptx`），来自真实答辩 PPTX 并经过去个人化处理，保留全部视觉结构（封面布局、章节分隔、导航元素、学校 logo），内容区域替换为占位符。同校/同导师的同学可以直接使用，无需再提供模板。其他学校的用户仍需提供自己的 `.pptx` 模板。
 
 模板详情见 `skills/thesis-defense-pptx/references/hrbcu_template.md`。
 

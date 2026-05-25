@@ -20,30 +20,27 @@
 python examples/minimal_markdown/run_example.py
 ```
 
-脚本会现场生成模板、可编辑 PPTX、dump 结构、scan 旧词，并输出 PPT 总览图。
-下面四张参考图来自一份**真实的郑州大学开题/答辩 PowerPoint 模板**，但画面不是
-模板原页截图，而是 `thesis.md` 示例内容被生成进模板后的 `final.pptx` 渲染结果：
+下面预览图来自本 Skill 内置的**哈尔滨商业大学 (HRBCU) 通用答辩模板**
+（`skills/thesis-defense-pptx/templates/HRBCU-defense-template.pptx`），
+模板已清除个人内容，全部正文替换为中文占位符：
 
-![生成示例 slides 1-4 总览](examples/minimal_markdown/expected/generated_overview_01.png)
+![模板预览](examples/minimal_markdown/expected/template_preview_01.png)
 
-![生成示例 slides 5-8 总览](examples/minimal_markdown/expected/generated_overview_02.png)
+![模板预览](examples/minimal_markdown/expected/template_preview_02.png)
 
-![封面细节](examples/minimal_markdown/expected/detail_slide_01.png)
+![模板预览](examples/minimal_markdown/expected/template_preview_03.png)
 
-![方法页细节](examples/minimal_markdown/expected/detail_slide_06.png)
+![模板预览](examples/minimal_markdown/expected/template_preview_04.png)
 
-> 这些图通过 `--template` 指定本地真实模板生成：
+![模板预览](examples/minimal_markdown/expected/template_preview_05.png)
+
+> 上图为经过去个人化处理的 HRBCU 模板原貌。HRBCU 同校/同导师同学可直接使用
+> 内置模板；其他学校用户需提供自己的 `.pptx` 模板：
 >
 > ```bash
 > python examples/minimal_markdown/run_example.py \
->     --template <你的本地模板.pptx> \
->     --detail-slides "1,6"
+>     --template <你的本地模板.pptx>
 > ```
->
-> `--template` 模式会调用 `build_deck.py --real-template`：不清空真实模板里的
-> 复杂 shape，而是在模板页面上覆盖 `thesis.md` 生成的示例内容，输出真正可编辑
-> 的 `final.pptx`。README 图片来自 PowerPoint COM 对这个生成后 deck 的真实
-> 渲染；每页右上角的 `Generated from thesis.md` 标记用于避免和模板原页截图混淆。
 
 > 该示例不依赖 Microsoft PowerPoint，因此 macOS / Linux / Windows 都能跑通。
 > 真实交付仍建议在 Windows + PowerPoint 下走 COM 导出和文字溢出检查。
@@ -61,7 +58,7 @@ python examples/minimal_markdown/run_example.py
 
 ## 为什么需要这个 Skill
 
-很多 AI PPT 工具擅长从文档重新设计一套新风格 PPT。但毕业论文答辩经常有相反的需求：学校或学院已经给了 `.pptx` 模板，封面、校徽、郑大红配色、顶部导航、卡片式正文、字体大小都不希望被改掉，只需要把论文内容转成适合答辩展示的表达。
+很多 AI PPT 工具擅长从文档重新设计一套新风格 PPT。但毕业论文答辩经常有相反的需求：学校或学院已经给了 `.pptx` 模板，封面、校徽、配色、顶部导航、卡片式正文、字体大小都不希望被改掉，只需要把论文内容转成适合答辩展示的表达。
 
 本 Skill 针对的正是这种“严格套用现成模板”的工作流：
 
@@ -107,7 +104,7 @@ python examples/minimal_markdown/run_example.py
 
 README 中引用 `ppt-master` 是为了说明相关开源项目和适用场景差异。若未来版本直接复用 `ppt-master` 的代码，应按照其 MIT License 明确保留对应源码文件和版权/许可声明。
 
-使用者需要自行确认其论文文本、实验图、学校模板、校徽、字体和第三方素材具备合法使用权限。本 Skill 不自带学校模板，也不分发第三方模板资产。
+使用者需要自行确认其论文文本、实验图、校徽、字体和第三方素材具备合法使用权限。本 Skill 内置一份哈尔滨商业大学 (HRBCU) 通用答辩模板（已清除个人内容），其他学校用户需自备模板。
 
 ## 仓库结构
 
