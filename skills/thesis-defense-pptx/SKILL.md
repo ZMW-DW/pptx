@@ -7,6 +7,18 @@ description: Create, polish, and quality-check editable undergraduate or graduat
 
 Use this skill for local, editable `.pptx` thesis defense decks that must follow a supplied university/lab/company PowerPoint template.
 
+## Built-in Templates
+
+This skill ships with a cleaned, reusable template for **Harbin University of Commerce (哈尔滨商业大学)**:
+
+- **Path:** `templates/HRBCU-defense-template.pptx`
+- **Slides:** 22 (16:9 widescreen, red `#830604` primary color)
+- **Structure:** Cover → TOC → 4 sections (background, literature review, research content, summary) → Closing
+- All personal and thesis-specific content has been replaced with `[placeholder]` labels.
+- Full slide-by-slide inventory: `references/hrbcu_template.md`
+
+When the user provides a thesis from this university, prefer this built-in template over asking them to supply one. If they provide their own `.pptx` template, use theirs instead — but apply the same cleaning and content-filling strategy documented here.
+
 ## Operating Principles
 
 - Platform: Windows + Microsoft PowerPoint for COM-driven cloning, export, and overflow inspection. On macOS/Linux, use the python-pptx-only parts and skip COM-based quality gates.
@@ -34,9 +46,11 @@ Use this skill for local, editable `.pptx` thesis defense decks that must follow
    - Collect defense-critical facts: problem, motivation, modeling, algorithms, experimental setup, baselines, metrics, key results, limitations, future work.
 
 3. Analyze the template:
+   - If using the built-in `templates/HRBCU-defense-template.pptx`, read `references/hrbcu_template.md` for the pre-mapped slide inventory.
    - Export template slides to PNG if PowerPoint is available.
    - Inspect cover, TOC, navigation, section, body/card, chart/image, summary, and closing slide styles.
    - Note fonts, font sizes, red/brand color, card dimensions, line widths, and spacing.
+   - Identify which shapes are decorative/structural (logos, header bars, section circles, arrows) vs. content-bearing (text boxes, tables, charts, content images).
 
 4. Build a native template skeleton:
    - Use PowerPoint COM (`scripts/clone_template_deck.ps1`) when PowerPoint is installed.
@@ -125,6 +139,7 @@ The fastest way to fail a content fill is guessing strings instead of reading th
 4. **Use the table/picture helpers.** `write_table(table, rows)` preserves cell font/color/size, and `replace_picture(slide, old_pic, new_path)` swaps an image while keeping position and size — both avoid the boilerplate of removing and re-creating shapes.
 5. **Re-run overflow + scan after every fill pass.** Overflow caused by longer content is the single most common bug; fix by shortening copy first, then by manual `\n` line breaks, and only resize the textbox if the template visual really allows it.
 6. **Encoding.** All Python scripts shipped here force `stdout` to UTF-8, and the PowerShell scripts force the console output codepage to UTF-8, so cp936/gbk consoles do not corrupt JSON output containing CJK paths or Unicode symbols (`−`, `Δ`, `✓`).
+7. **Template cleaning.** When adapting a previous student's template for reuse: keep structural shapes (logos, header bars, section circles, decorative polygons/arrows) and remove or clear all thesis-specific content (body text, tables, charts, content images, model architecture screenshots). Replace with descriptive `[placeholders]` so future users know what content goes where. Use `getattr(shape, "has_text_frame", False)` (not `hasattr`) before accessing `.text` — Picture objects expose `has_text_frame` but raise on `.text`.
 
 ## Script Usage
 

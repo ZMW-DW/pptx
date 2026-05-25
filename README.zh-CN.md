@@ -8,6 +8,7 @@
 
 - 从本地论文 PDF/LaTeX 项目中提取论文内容和候选图表。
 - 尽量保留已有 PowerPoint 模板的封面、字体、字号、配色、导航、卡片样式和页面比例。
+- 内置哈尔滨商业大学通用答辩模板（`skills/thesis-defense-pptx/templates/HRBCU-defense-template.pptx`），同校/同导师可直接使用。
 - 输出真实可编辑的 `.pptx` 文件，而不是图片型幻灯片。
 - 使用 PowerPoint COM 导出逐页 PNG，便于视觉检查。
 - 生成整套 PPT 的总览图，快速发现版式问题。
@@ -62,7 +63,7 @@
 
 README 中引用 `ppt-master` 是为了说明相关开源项目和适用场景差异。若未来版本直接复用 `ppt-master` 的代码，应按照其 MIT License 明确保留对应源码文件和版权/许可声明。
 
-使用者需要自行确认其论文文本、实验图、学校模板、校徽、字体和第三方素材具备合法使用权限。本 Skill 不自带学校模板，也不分发第三方模板资产。
+使用者需要自行确认其论文文本、实验图、学校模板、校徽、字体和第三方素材具备合法使用权限。本 Skill 内置一份哈尔滨商业大学通用答辩模板（已去个人化），其他学校用户需自备模板。
 
 ## 仓库结构
 
@@ -181,7 +182,9 @@ python .\skills\thesis-defense-pptx\scripts\make_contact_sheet.py `
 
 ## 说明
 
-本 Skill 不内置固定 PPT 模板。它的目标是尽量复用用户提供的模板，而不是强行套用通用设计风格。
+本 Skill 内置了一份哈尔滨商业大学（HRBCU）的通用答辩模板（`skills/thesis-defense-pptx/templates/HRBCU-defense-template.pptx`），来自真实答辩 PPTX 并经过去个人化处理，保留全部视觉结构。同校/同导师的同学可直接使用。其他学校的用户仍需提供自己的 `.pptx` 模板。
+
+模板详情见 `skills/thesis-defense-pptx/references/hrbcu_template.md`。
 
 ## 许可证
 

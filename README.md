@@ -53,6 +53,7 @@ python examples/minimal_markdown/run_example.py
 - 从本地论文 PDF/LaTeX 项目中提取论文内容和候选图表。
 - 尽量保留已有 PowerPoint 模板的封面、字体、字号、配色、导航、卡片样式和页面比例。
 - 输出真实可编辑的 `.pptx` 文件，而不是图片型幻灯片。
+- 内置哈尔滨商业大学通用答辩模板（`skills/thesis-defense-pptx/templates/HRBCU-defense-template.pptx`），该模板同学/同导师可直接使用。
 - 使用 PowerPoint COM 导出逐页 PNG，便于视觉检查。
 - 生成整套 PPT 的总览图，快速发现版式问题。
 - 使用真实 PowerPoint 渲染结果检查文字框溢出风险。
@@ -117,7 +118,10 @@ skills/
     ├── agents/
     │   └── openai.yaml
     ├── references/
+    │   ├── hrbcu_template.md        # 哈商大模板逐页说明
     │   └── pptx_quality_gate.md
+    ├── templates/
+    │   └── HRBCU-defense-template.pptx  # 哈商大通用答辩模板（22页，已清除个人内容）
     └── scripts/
         ├── clone_template_deck.ps1
         ├── dump_pptx_content.py
@@ -225,7 +229,9 @@ python .\skills\thesis-defense-pptx\scripts\make_contact_sheet.py `
 
 ## 说明
 
-本 Skill 不内置固定 PPT 模板。它的目标是尽量复用用户提供的模板，而不是强行套用通用设计风格。
+本 Skill 内置了一份哈尔滨商业大学（HRBCU）的通用答辩模板，来自真实答辩 PPTX 并经过去个人化处理，保留全部视觉结构（封面布局、章节分隔、导航元素、学校 logo），内容区域替换为占位符。同校/同导师的同学可以直接使用，无需再提供模板。其他学校的用户仍需提供自己的 `.pptx` 模板。
+
+模板详情见 `skills/thesis-defense-pptx/references/hrbcu_template.md`。
 
 ## 许可证
 

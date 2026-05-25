@@ -53,6 +53,7 @@ The workflow is designed for cases where template fidelity matters: university d
 
 - Reads thesis source material from a local PDF/LaTeX project.
 - Preserves an existing PowerPoint template's cover, typography, colors, navigation, card style, and slide proportions.
+- Ships a built-in Harbin University of Commerce (HRBCU) defense template — cleaned of personal content, ready for reuse by students from the same school/advisor.
 - Builds editable `.pptx` decks instead of image-only slides.
 - Exports slides to PNG for visual review.
 - Generates a contact sheet for whole-deck inspection.
@@ -118,7 +119,10 @@ skills/
     ├── agents/
     │   └── openai.yaml
     ├── references/
+    │   ├── hrbcu_template.md        # HRBCU template slide-by-slide reference
     │   └── pptx_quality_gate.md
+    ├── templates/
+    │   └── HRBCU-defense-template.pptx  # HRBCU generic defense template (22 slides, cleaned)
     └── scripts/
         ├── clone_template_deck.ps1
         ├── dump_pptx_content.py
@@ -226,7 +230,9 @@ python .\skills\thesis-defense-pptx\scripts\make_contact_sheet.py `
 
 ## Notes
 
-This skill intentionally does not ship a built-in slide template. It is meant to preserve the user's supplied template rather than impose a generic presentation style.
+This skill ships a built-in Harbin University of Commerce (HRBCU) defense template adapted from a real thesis defense PPTX. All personal content has been replaced with placeholders; visual structure (cover, section dividers, navigation, logos) is preserved. Students from the same school/advisor can use it directly. Users from other schools should supply their own `.pptx` template.
+
+Template details: `skills/thesis-defense-pptx/references/hrbcu_template.md`.
 
 ## License
 
